@@ -1,10 +1,17 @@
 import * as vscode from 'vscode';
 import * as spawn from 'cross-spawn';
 import * as child_process from 'child_process';
+import * as path from 'path';
 
 import { Log } from './log';
 
 export class Util {
+  static context: vscode.ExtensionContext;
+
+  static getResource(rel: string) {
+    return path.resolve(this.context.extensionPath, rel.replace(/\//g, path.sep));
+  }
+
   static processToPromise(cmd: string, args: any[], opts?: child_process.SpawnOptions) {
 
     Log.info([cmd, ...args].join(' '));

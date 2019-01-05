@@ -20,6 +20,7 @@ export class Config {
       duration: 0,
       fps: 10,
       port: 8088,
+      cursorImage: 'images/cursor-24.png',
       ...(this._config.get('chronicler.recording-defaults') || {})
     };
   }

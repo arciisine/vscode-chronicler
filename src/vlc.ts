@@ -1,4 +1,5 @@
 import * as net from 'net';
+
 import { Config } from './config';
 import { Log } from './log';
 import { Util } from './util';
@@ -18,12 +19,15 @@ export interface VlcRecordOptions {
   };
 
   port: number;
-  duration?: number;
   fps: number;
   bounds: Bounds;
+  file: string;
+
+  cursorImage?: string;
+  audio?: boolean;
+  duration?: number;
   transcode?: any;
   flags?: any;
-  file: string;
 }
 
 export class VlcUtil {
@@ -33,7 +37,7 @@ export class VlcUtil {
     const transcodeOpt = {
       vcodec: 'h264',
       venc: 'x264{preset=ultrafast,profile=baseline,crf=0}',
-      acodec: 'none',
+      acodec: opts.audio ? 'mp3' : 'none',
       quality: 100,
       fps: opts.fps,
       scale: 1,
@@ -56,6 +60,7 @@ export class VlcUtil {
 
     const configOpt: { [key: string]: any } = {
       'no-screen-follow-mouse': '',
+      'screen-mouse-image': opts.cursorImage ? Util.getResource(opts.cursorImage) : null,
 
       'ignore-config': '',
       'no-plugins-cache': '',
@@ -77,15 +82,16 @@ export class VlcUtil {
 
       'rc-host': `localhost:${opts.port}`,
       // 'rc-quiet': '', // TODO: maybe win specific
-      // 'no-sout-audio': '',
       sout: `'#transcode{${transcodeFlags}}:duplicate{dst=std{${outputFlags}}}'`,
       ...(opts.flags || {})
     };
 
-    const args = Object.keys(configOpt).map(x => {
-      const v = configOpt[x];
-      return `${x.length > 1 ? '--' : '-'}${x}${v === '' ? '' : `=${v}`}`;
-    });
+    const args = Object.keys(configOpt)
+      .filter(x => configOpt[x] !== null)
+      .map(x => {
+        const v = configOpt[x];
+        return `${x.length > 1 ? '--' : '-'}${x}${v === '' ? '' : `=${v}`}`;
+      });
 
     return ['screen://', ...args];
   }

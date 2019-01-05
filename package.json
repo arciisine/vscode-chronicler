@@ -36,6 +36,16 @@
         "command": "chronicler.record"
       },
       {
+        "title": "Start Recording with Audio",
+        "category": "Chronicler",
+        "command": "chronicler.recordWithAudio"
+      },
+      {
+        "title": "Start Timed-Recording",
+        "category": "Chronicler",
+        "command": "chronicler.recordWithDuration"
+      },
+      {
         "title": "Stop Recording",
         "category": "Chronicler",
         "command": "chronicler.stop"
@@ -83,7 +93,8 @@
             "type": "object",
             "default": {
               "fps": 10,
-              "port": 8088
+              "port": 8088,
+              "cursorImage": "images/cursor-24.png"
             }
           },
           "chronicler.debug": {

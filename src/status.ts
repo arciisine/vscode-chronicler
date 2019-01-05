@@ -23,4 +23,16 @@ export class RecordingStatus {
     this.item.text = !active ? '$(triangle-right) Chronicler' : '$(primitive-square) Chronicler';
     this.item.color = !active ? 'white' : '#880000';
   }
+
+  async countDown(seconds = 5) {
+    this.item.command = 'chronicler.stop';
+
+    for (let i = seconds; i > 0; i--) {
+      this.item.color = ['#FFFF00', '#FFFF33', '#FFFF66', '#FFFF99', '#FFFFC'][5 - i];
+      this.item.text = `$(pulse) Starting in ${i} seconds`;
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    this.item.text = '$(pulse) Chronicler Starting ...';
+    this.item.color = 'orange';
+  }
 }

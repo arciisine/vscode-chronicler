@@ -17,7 +17,7 @@ export class Recorder {
     this.stop();
   }
 
-  async start() {
+  async start(override: Partial<VlcRecordOptions> = {}) {
     const { bounds } = await win();
 
     const paths = await Config.getVlcPaths();
@@ -32,6 +32,7 @@ export class Recorder {
       ...Config.getRecordingDefaults(),
       bounds: bounds!,
       file: await Config.getFilename(),
+      ...override,
       paths
     };
 

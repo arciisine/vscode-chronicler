@@ -32,11 +32,11 @@ The available configuration options are:
 * `chronicler.dest-folder` - This is the output folder for all recordings, defaults to `$HOME/Recordings`
 * `chronicler.recording-defaults` - These are the default parameters for recording, this supports the following:
   * `port: number` - The telnet port used by vlc, defaults to `8088`
+  * `cursorImage?: string` - The path to image to use for the cursor during recording, setting a blank value will use the operating system icon.  By default we use a standard icon `images/icon-24.png`.
   * `duration?: number` - How long to record for, defaults to `0` which is indefinite
   * `fps: number` - Number of frames per second, defaults to `12`
   * `transcode?: object` - Configuration parameters to pass to the VLC transcode process
-  * `flags?: object` - Configuration flags to pass to the VLC process
-
+  * `flags?: object` - Configuration flags to pass to the VLC process 
 * `chronicler.debug` - Run the plugin in debug mode, provides more information when running vlc
 
 ## Animated GIFs
@@ -54,6 +54,7 @@ This project was inspired by and based on:
 
 * [vscode-screen-recorder](https://github.com/wk-j/vscode-screen-recorder), providing inspiration and UI patterns.
 * [screen-recorder](https://github.com/131/screen-recorder), providing the idea of using VLC and telnet. Additionally provided the basis for the VLC command line arguments. 
+* [icons8](https://icons8.com) For providing the default mouse image
 
 # Known Issues
 
