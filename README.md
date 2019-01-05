@@ -25,7 +25,7 @@ The available configuration options are:
 * `chronicler.ffmpeg-binary` - (optional) This is the path to the FFMpeg binary, this will be used to convert the recordings into animated .gif files, if specified
 * `chronicler.dest-folder` - This is the output folder for all recordings, defaults to `$HOME/Recordings`
 * `chronicler.recording-defaults` - These are the default parameters for recording, this supports the following:
-  * `port: number` - The telnet port used by vlc, defaults to `8080`
+  * `port: number` - The telnet port used by vlc, defaults to `8088`
   * `duration?: number` - How long to record for, defaults to `0` which is indefinite
   * `fps: number` - Number of frames per second, defaults to `12`
   * `transcode?: object` - Configuration parameters to pass to the VLC transcode process
@@ -33,9 +33,14 @@ The available configuration options are:
 
 * `chronicler.debug` - Run the plugin in debug mode, provides more information when running vlc
 
+## Animated GIFs
+
+Animated GIFs are supported, if you configure `chronicler.ffmpeg-binary` appropriately in your vscode settings.  Once setup, it will produce an additional GIF file of your mp4, encoded as best as possible.
+
 # Requirements
 
 * [VLC](https://www.videolan.org/vlc/) must be installed, with the access plugins for screen recording
+* [FFmpeg](https://www.ffmpeg.org/download.html) can be optionally installed for producing animated GIFs.
 
 # Known Issues
 
