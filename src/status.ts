@@ -20,7 +20,7 @@ export class RecordingStatus {
 
   setState(active: boolean) {
     this.item.command = !active ? 'chronicler.record' : 'chronicler.stop';
-    this.item.text = !active ? '$(device-camera-video) Record Screen' : '$(diff-modified)  Stop Recording';
+    this.item.text = !active ? '$(triangle-right) Chronicler' : '$(primitive-square) Chronicler';
     this.item.color = !active ? 'white' : '#880000';
   }
 }

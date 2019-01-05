@@ -1,9 +1,9 @@
-Chronicler
+VSCode Chronicler
 ----------------------------------
 
 Chronicler is a visual studio code plugin for recording sessions within vscode. The application relies upon [VLC](https://www.videolan.org/vlc/) being installed, with access to the screen device.  The primary functionality of the plugin is to start and stop recording. The status bar contains an item that will provide you the current state of the recording process, and is an actionable element for starting/stopping a recording.
 
-![Screen Capture in Action](./images/session.gif)
+![Screen Capture in Action](./media/screencast-small.gif)
 
 ## Start Recording
 This will initiate a new recording, and will prompt for the VLC installation directory if not set yet.  This can be triggered by:
@@ -41,6 +41,13 @@ Animated GIFs are supported, if you configure `chronicler.ffmpeg-binary` appropr
 
 * [VLC](https://www.videolan.org/vlc/) must be installed, with the access plugins for screen recording
 * [FFmpeg](https://www.ffmpeg.org/download.html) can be optionally installed for producing animated GIFs.
+
+#Acknowledgements
+
+This project was inspired by and based on:
+
+* [vscode-screen-recorder](https://github.com/wk-j/vscode-screen-recorder), providing inspiration and UI patterns.
+* [screen-recorder](https://github.com/131/screen-recorder), providing the idea of using VLC and telnet. Additionally provided the basis for the VLC command line arguments. 
 
 # Known Issues
 
