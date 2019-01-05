@@ -1,0 +1,88 @@
+{
+  "name": "chronicler",
+  "displayName": "Chronicler",
+  "description": "Visual Studio Session Recorder",
+  "version": "0.0.1",
+  "publisher": "arcsine",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arciisine/vscode-chronicler"
+  },
+  "keywords": [
+    "Editor Recording",
+    "Video Recording"
+  ],
+  "engines": {
+    "vscode": "^1.30.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "commands": [
+      {
+        "title": "Start Recording",
+        "category": "Chronicler",
+        "command": "chronicler.record"
+      },
+      {
+        "title": "Stop Recording",
+        "category": "Chronicler",
+        "command": "chronicler.stop"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "ctrl+alt+shift+r",
+        "mac": "cmd+alt+shift+r",
+        "command": "chronicler.record"
+      },
+      {
+        "key": "ctrl+alt+shift+s",
+        "mac": "cmd+alt+shift+s",
+        "command": "chronicler.stop"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "Chronicler",
+        "properties": {
+          "chronicler.vlc-home": {
+            "description": "VLC Installation Directory",
+            "type": "string"
+          },
+          "chronicler.dest-folder": {
+            "description": "Output Folder for Captures",
+            "type": "string"
+          },
+          "chronicler.debug": {
+            "description": "Run VLC in debug mode",
+            "type": "boolean"
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.18",
+    "typescript": "^3.2.2",
+    "vscode": "^1.1.26"
+  },
+  "dependencies": {
+    "@types/active-win": "^4.0.0",
+    "@types/cross-spawn": "^6.0.0",
+    "active-win": "^4.0.0",
+    "cross-spawn": "^6.0.5"
+  }
+}

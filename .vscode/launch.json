@@ -1,0 +1,54 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    // A launch configuration that compiles the extension and then opens it inside a new window
+    {
+      "name": "Launch Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceRoot}",
+        "${workspaceRoot}/../travetto/module/rest-express"
+      ],
+      "env": {
+        "DEBUG": "1",
+        "NODE_PRESERVE_SYMLINKS": "1"
+      },
+      "stopOnEntry": false,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceRoot}/out/src/**/*.js"
+      ],
+      "preLaunchTask": "npm",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/@travetto/context/**/*",
+        "**/@travetto/base/**/stacktrace.*",
+        "**/@travetto/compiler/**/proxy.*",
+        "**/node_modules/cls-hooked/**/*",
+        "**/node_modules/trace/**/*",
+        "**/node_modules/stack-chain/**/*"
+      ]
+    },
+    {
+      "name": "Launch Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceRoot}",
+        "--extensionTestsPath=${workspaceRoot}/out/test"
+      ],
+      "stopOnEntry": false,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceRoot}/out/test/**/*.js"
+      ],
+      "preLaunchTask": "npm"
+    }
+  ]
+}
