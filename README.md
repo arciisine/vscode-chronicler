@@ -1,5 +1,7 @@
-VSCode Chronicler
-----------------------------------
+<h1>
+  <sub><img src="https://github.com/arciisine/vscode-chronicler/raw/master/images/logo.png" height="40"></sub>
+  VSCode Chronicler
+</h1>
 
 Chronicler is a visual studio code plugin for recording sessions within vscode. The application relies upon [VLC](https://www.videolan.org/vlc/) being installed, with access to the screen device.  The primary functionality of the plugin is to start and stop recording. The status bar contains an item that will provide you the current state of the recording process, and is an actionable element for starting/stopping a recording.
 
