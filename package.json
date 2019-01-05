@@ -22,6 +22,11 @@
   "activationEvents": [
     "*"
   ],
+  "icon": "images/logo.png",
+  "galleryBanner": {
+    "color": "#c6cdd3",
+    "theme": "light"
+  },
   "main": "./out/extension",
   "contributes": {
     "commands": [

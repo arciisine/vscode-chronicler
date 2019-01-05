@@ -3,15 +3,19 @@ VSCode Chronicler
 
 Chronicler is a visual studio code plugin for recording sessions within vscode. The application relies upon [VLC](https://www.videolan.org/vlc/) being installed, with access to the screen device.  The primary functionality of the plugin is to start and stop recording. The status bar contains an item that will provide you the current state of the recording process, and is an actionable element for starting/stopping a recording.
 
-![Screen Capture in Action](./media/screencast-small.gif)
+![Screen Capture in Action](./images/screencast-small.gif)
 
-## Start Recording
+## How Recording Works
+The recording process determines the location and dimensions of your VS Code window, and will start a recording session for that region, immediately.  To prevent the UI from getting in the way, when stopping, use the keyboard shortcuts to terminate the process. The status bar will be your indicator of the current status of your recording.  On completion you can can choose to open the file with your operating system, you can copy the path to your clipboard, or just dismiss.  Additionally, if you are configured your settings for supporting the animated gif production, the file path  will change to point to the `.gif` file instead of the `.mp4` file.
+
+
+## How to Start Recording
 This will initiate a new recording, and will prompt for the VLC installation directory if not set yet.  This can be triggered by:
 * Click on the icon in the status bar to launch the recorder
 * Accessing the command, via the command palette `Chronicler Start Recording`
 * Using the predefined shortcut (by default `cmd+alt+shift+r`)
 
-## Stop Recording 
+## How to Stop Recording 
 This will stop the current recording, and provide a link to the final file location.  This can be triggered by:
 * Click on the icon in the status bar to terminate the recorder
 * Accessing the command, via the command palette `Chronicler Stop Recording`
