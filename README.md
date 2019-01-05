@@ -15,8 +15,8 @@ This will initiate a new recording, and will prompt for the FFmpeg installation 
 * Click on the icon in the status bar to launch the recorder
 * Accessing the command, via the command palette:
    - `Chronicler Start Recording` - Standard recording
+   - `Chronicler Start Timed-Recording` - Recording with a set duration, user will be prompted, with a default of `120` seconds.
    - `Chronicler Start Recording with Audio` - (Experimental) Standard recording with audio support
-   - `Chronicler STart Timed-Recording` - Recording with a set duration, user will be prompted, with a default of `120` seconds.
 
 * Using the predefined shortcut (by default `cmd+alt+shift+r`)
 
