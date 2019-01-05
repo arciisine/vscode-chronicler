@@ -99,7 +99,9 @@
   "dependencies": {
     "@types/active-win": "^4.0.0",
     "@types/cross-spawn": "^6.0.0",
+    "@types/opn": "^5.1.0",
     "active-win": "^4.0.0",
-    "cross-spawn": "^6.0.5"
+    "cross-spawn": "^6.0.5",
+    "opn": "^5.4.0"
   }
 }

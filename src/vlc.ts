@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as spawn from 'cross-spawn';
-import * as util from 'util';
 import * as net from 'net';
 import { Config } from './config';
 
@@ -34,7 +33,8 @@ export class VlcUtil {
 
     const transcodeOpt = {
       vcodec: 'h264',
-      venc: 'x264{preset=medium,profile=baseline,crf=22,qp=0}',
+      venc: 'x264{preset=ultrafast,profile=baseline,crf=0}',
+      acodec: 'none',
       quality: 100,
       fps: opts.fps,
       scale: 1,
@@ -78,7 +78,7 @@ export class VlcUtil {
 
       'rc-host': `localhost:${opts.port}`,
       // 'rc-quiet': '', // TODO: maybe win specific
-      'no-sout-audio': '',
+      // 'no-sout-audio': '',
       sout: `'#transcode{${transcodeFlags}}:duplicate{dst=std{${outputFlags}}}'`,
       ...(opts.flags || {})
     };
@@ -144,11 +144,10 @@ export class VlcUtil {
           const stream = net.connect({ port }, () => {
             this.output.appendLine(`[INFO] Connected to: ${port}`);
             stream!.removeAllListeners('error');
-            const write = util.promisify(stream.write).bind(stream) as any as (msg: string) => Promise<void>;
-            resolve(() => {
+            resolve(() => new Promise((res, rej) => {
               this.output.appendLine('[INFO] Sending Quit');
-              return write('quit');
-            });
+              stream.write('quit\r\n', (err: any) => err ? rej(err) : res());
+            }));
           });
           stream.setNoDelay();
           stream.on('error', reject);

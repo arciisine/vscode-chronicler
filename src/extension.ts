@@ -1,6 +1,10 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
+
 import { Recorder } from './recorder';
 import { RecordingStatus } from './status';
+
+import opn = require('opn');
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -10,7 +14,14 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand('chronicler.stop', async () => {
     try {
       const file = await controller.stop();
-      vscode.window.showInformationMessage(file, 'Open');
+      vscode.window.showInformationMessage(file, 'Open', 'Copy', 'Dismiss')
+        .then(res => {
+          if (res === 'Open') {
+            opn(file, { wait: false });
+          } else if (res === 'Copy') {
+            vscode.env.clipboard.writeText(file);
+          }
+        });
     } catch (e) {
       vscode.window.showErrorMessage(e.message);
     }
