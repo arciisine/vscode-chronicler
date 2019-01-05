@@ -21,13 +21,11 @@ export class Recorder {
     const vlcPath = await Config.getVlcLocation();
 
     if (!vlcPath) {
-      throw new Error('Missing vlc location');
+      return; // User canceled
     }
 
     const opts = {
-      duration: 0,
-      fps: 10,
-      port: 8088,
+      ...Config.getRecordingDefaults(),
       bounds: info.bounds!,
       file: await Config.getFilename(),
       vlcPath

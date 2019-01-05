@@ -10,7 +10,8 @@
   },
   "keywords": [
     "Editor Recording",
-    "Video Recording"
+    "Video Recording",
+    "Session Recording"
   ],
   "engines": {
     "vscode": "^1.30.1"
@@ -58,6 +59,14 @@
           "chronicler.dest-folder": {
             "description": "Output Folder for Captures",
             "type": "string"
+          },
+          "chronicler.recording-defaults": {
+            "description": "Recording defaults",
+            "type": "object",
+            "default": {
+              "fps": 10,
+              "port": 8088
+            }
           },
           "chronicler.debug": {
             "description": "Run VLC in debug mode",

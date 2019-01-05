@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand('chronicler.stop', async () => {
     try {
       const file = await controller.stop();
-      vscode.window.showInformationMessage(file);
+      vscode.window.showInformationMessage(file, 'Open');
     } catch (e) {
       vscode.window.showErrorMessage(e.message);
     }

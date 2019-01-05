@@ -19,6 +19,7 @@ export interface VlcRecordOptions {
   fps: number;
   bounds: Bounds;
   transcode?: any;
+  flags?: any;
   file: string;
 }
 
@@ -75,6 +76,7 @@ export class VlcUtil {
       // 'rc-quiet': '', // TODO: maybe win specific
       'no-sout-audio': '',
       sout: `'#transcode{${transcodeFlags}}:duplicate{dst=std{${outputFlags}}}'`,
+      ...(opts.flags || {})
     };
 
     const args = Object.keys(configOpt).map(x => {
