@@ -9,7 +9,7 @@ export class Util {
   static context: vscode.ExtensionContext;
 
   static getResource(rel: string) {
-    return path.resolve(this.context.extensionPath, rel.replace(/\//g, path.sep));
+    return path.resolve(this.context.extensionPath, rel.replace(/\//g, path.sep)).replace(/\\/g, '/');
   }
 
   static processToPromise(cmd: string, args: any[], opts?: child_process.SpawnOptions) {
@@ -24,7 +24,16 @@ export class Util {
 
     proc.stderr.on('data', x => Log.debug(x.toString().trim()));
 
-    const done = () => proc.kill();
+    const kill = (now: boolean = false) => {
+      if (!now) {
+        (proc as any).quitting = !now;
+        proc.kill('SIGTERM');
+      } else {
+        proc.kill('SIGKILL');
+      }
+    };
+
+    const done = () => kill.bind(null, false);
 
     process.on('exit', done);
 
@@ -35,7 +44,7 @@ export class Util {
 
       proc.once('exit', (code) => {
         process.removeListener('exit', done);
-        if (code) {
+        if (code && !(proc as any).quitting) {
           Log.error(`Invalid exit status: ${code}`);
           reject(new Error(`Invalid exit status: ${code}`));
         } else {
@@ -45,8 +54,6 @@ export class Util {
       });
     });
 
-    const kill = (now: boolean = false) => proc.kill(now ? 'SIGKILL' : 'SIGTERM');
-
-    return { finish, kill };
+    return { finish, kill, proc };
   }
 }

@@ -5,7 +5,8 @@ import { RecordingStatus } from './status';
 
 import opn = require('opn');
 import { Util } from './util';
-import { VlcRecordOptions } from './vlc';
+import { RecordingOptions } from './types';
+import { Config } from './config';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -15,31 +16,36 @@ export function activate(context: vscode.ExtensionContext) {
   const status = new RecordingStatus();
 
   async function stop() {
-    try {
-      const { file } = await controller.stop();
-      vscode.window.showInformationMessage(`Session output ${file}`, 'Open', 'Copy', 'Dismiss')
-        .then(res => {
-          if (res === 'Open') {
-            opn(file, { wait: false });
-          } else if (res === 'Copy') {
-            vscode.env.clipboard.writeText(file);
-          }
-        });
-    } catch (e) {
-      vscode.window.showErrorMessage(e.message);
-    }
-    status.setState(controller.active);
+    status.stopping();
+    controller.stop();
   }
 
-  async function record(opts: Partial<VlcRecordOptions> = {}) {
+  async function record(opts: Partial<RecordingOptions> = {}) {
     try {
-      await status.countDown(5);
-      await controller.start(opts);
-      status.setState(true);
+      if (!(await Config.getFFmpegBinary())) {
+        return;
+      }
+      await status.countDown();
+      const run = await controller.run(opts)!;
+      status.recording();
+
+      const { file } = (await run.output)!;
+
+      status.setState(false);
+
+      const choice = await vscode.window.showInformationMessage(`Session output ${file}`, 'Open', 'Copy', 'Dismiss');
+
+      if (choice === 'Open') {
+        opn(file, { wait: false });
+      } else if (choice === 'Copy') {
+        vscode.env.clipboard.writeText(file);
+      }
+
     } catch (e) {
       vscode.window.showErrorMessage(e.message);
+    } finally {
+      status.setState(false);
     }
-    status.setState(controller.active);
   }
 
   vscode.commands.registerCommand('chronicler.stop', stop);
@@ -51,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
       placeHolder: '120'
     });
     if (time) {
-      record({ duration: parseInt(time, 10) * 1000 });
+      record({ duration: parseInt(time, 10) });
     }
   });
 

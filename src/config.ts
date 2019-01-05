@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as util from 'util';
+import { RecordingOptions } from './types';
 
 const exists = util.promisify(fs.exists);
 
@@ -19,10 +20,10 @@ export class Config {
     return {
       duration: 0,
       fps: 10,
-      port: 8088,
-      cursorImage: 'images/cursor-24.png',
+      animatedGif: false,
+      countdown: 5,
       ...(this._config.get('chronicler.recording-defaults') || {})
-    };
+    } as RecordingOptions;
   }
 
   static async getFilename() {
@@ -97,48 +98,7 @@ export class Config {
     return this._config.get(key) as string;
   }
 
-  static async getVlcBinary() {
-    return await this.getLocation('vlc-binary', {
-      title: 'VLC Binary',
-      platformDefaults: {
-        darwin: ['/Applications/VLC.app/Contents/MacOS/VLC'],
-        win32: ['C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe'],
-        linux: ['/usr/bin/vlc', '/usr/local/bin/vlc']
-      },
-      folder: false
-    });
-  }
-
-  static async getVlcPluginsFolder() {
-    return this.getLocation('vlc-plugins-folder', {
-      title: 'VLC Plugin Folder',
-      platformDefaults: {
-        darwin: ['/Applications/VLC.app/Contents/MacOS/plugins'],
-        win32: ['C:\\Program Files (x86)\\VideoLAN\\VLC\\plugins'],
-        linux: ['/usr/lib/vlc/plugins', '/usr/share/lib/vlc/plugins']
-      },
-      folder: true,
-      validator: file => /vlc.*plugins/i.test(file)
-    });
-  }
-
-  static async getVlcDataFolder() {
-    return this.getLocation('vlc-data-folder', {
-      title: 'VLC Data Folder',
-      platformDefaults: {
-        darwin: ['/Applications/VLC.app/Contents/MacOS/data'],
-        win32: ['C:\\Program Files (x86)\\VideoLAN\\VLC\\data'],
-        linux: ['/usr/lib/vlc/data', '/usr/share/lib/vlc/data']
-      },
-      folder: true,
-      validator: file => /vlc.*data/i.test(file)
-    });
-  }
-
   static async getFFmpegBinary() {
-    if (this._config.get('chronicler.ffmpeg-binary') === 'false') {
-      return;
-    }
     const res = await this.getLocation('ffmpeg-binary', {
       title: 'FFMpeg Binary',
       platformDefaults: {
@@ -153,31 +113,5 @@ export class Config {
     }
 
     return res;
-  }
-
-  static async getVlcPaths() {
-    const vlcBinary = await Config.getVlcBinary();
-
-    if (!vlcBinary) {
-      return; // User canceled
-    }
-
-    const vlcPlugins = await Config.getVlcPluginsFolder();
-
-    if (!vlcPlugins) {
-      return; // User canceled
-    }
-
-    const vlcData = await Config.getVlcDataFolder();
-
-    if (!vlcData) {
-      return; // User canceled
-    }
-
-    return {
-      binary: vlcBinary,
-      plugins: vlcPlugins,
-      data: vlcData
-    };
   }
 }

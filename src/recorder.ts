@@ -1,62 +1,64 @@
 import * as win from 'active-win';
 
-import { VlcUtil, VlcRecordOptions } from './vlc';
 import { FFmpegUtil } from './ffmpeg';
 import { Config } from './config';
+import { RecordingOptions } from './types';
+import { ChildProcess } from 'child_process';
 
 export class Recorder {
 
-  private proc: { kill: (now: boolean) => void, finish: Promise<VlcRecordOptions> };
-  private streamStop: () => Promise<void>;
+  private proc: { proc: ChildProcess, kill: (now: boolean) => void, finish: Promise<RecordingOptions> };
 
   get active() {
     return !!this.proc;
+  }
+
+  get finish() {
+    return this.proc.finish;
   }
 
   dispose() {
     this.stop();
   }
 
-  async start(override: Partial<VlcRecordOptions> = {}) {
+  async postProcess(opts: RecordingOptions) {
+    try {
+      await this.proc.finish;
+      if (opts.animatedGif) {
+        const result = await FFmpegUtil.generateGIF(opts);
+
+        if (result) {
+          const animated = await result.finish;
+          opts.file = animated;
+        }
+      }
+      return opts;
+    } finally {
+      this.proc.kill(true);
+      delete this.proc;
+    }
+  }
+
+  async run(override: Partial<RecordingOptions> = {}) {
     const { bounds } = await win();
 
-    const paths = await Config.getVlcPaths();
-
-    if (!paths) {
-      return;
-    }
-
-    await Config.getFFmpegBinary();
+    const binary = (await Config.getFFmpegBinary())!;
 
     const opts = {
       ...Config.getRecordingDefaults(),
       bounds: bounds!,
       file: await Config.getFilename(),
       ...override,
-      paths
+      ffmpegBinary: binary
     };
 
     if (this.proc) {
       throw new Error('Recording already in progress');
     }
 
-    this.proc = await VlcUtil.launchProcess(opts);
-    this.streamStop = await VlcUtil.connect(opts.port);
-  }
+    this.proc = await FFmpegUtil.launchProcess(opts);
 
-  async convertToGif(opts: VlcRecordOptions) {
-    const result = await FFmpegUtil.toAnimatedGif(opts.file, {
-      fps: opts.fps,
-      w: opts.bounds.width,
-      h: opts.bounds.height
-    });
-
-    if (result) {
-      const animated = await result.finish;
-      opts.file = animated;
-    }
-
-    return opts;
+    return { output: this.postProcess(opts) };
   }
 
   async stop() {
@@ -64,19 +66,9 @@ export class Recorder {
       throw new Error('No recording running');
     }
     try {
-      await this.streamStop();
-      this.proc.kill(false);
-
-      const opts = await this.proc.finish;
-
-      if (await Config.getFFmpegBinary()) {
-        await this.convertToGif(opts);
-      }
-
-      return opts;
-    } finally {
+      this.proc.proc.stdin.write('q');
+    } catch {
       this.proc.kill(true);
-      delete this.proc;
     }
   }
 }

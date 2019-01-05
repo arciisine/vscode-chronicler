@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Visual Studio Session Recorder",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
@@ -67,22 +67,9 @@
       {
         "title": "Chronicler",
         "properties": {
-          "chronicler.vlc-binary": {
-            "description": "VLC Binary Location",
-            "type": "string"
-          },
-          "chronicler.vlc-plugins-folder": {
-            "description": "VLC Plugin Folder",
-            "type": "string"
-          },
-          "chronicler.vlc-data-folder": {
-            "description": "VLC Data Folder",
-            "type": "string"
-          },
           "chronicler.ffmpeg-binary": {
             "description": "FFmpeg Binary Location",
-            "type": "string",
-            "default": "false"
+            "type": "string"
           },
           "chronicler.dest-folder": {
             "description": "Output Folder for Captures",
@@ -93,12 +80,11 @@
             "type": "object",
             "default": {
               "fps": 10,
-              "port": 8088,
-              "cursorImage": "images/cursor-24.png"
+              "countdown": 5
             }
           },
           "chronicler.debug": {
-            "description": "Run VLC in debug mode",
+            "description": "Run with debug logging enabled",
             "type": "boolean"
           }
         }
@@ -123,6 +109,7 @@
     "@types/opn": "^5.1.0",
     "active-win": "^4.0.0",
     "cross-spawn": "^6.0.5",
-    "opn": "^5.4.0"
+    "opn": "^5.4.0",
+    "screen-info": "^1.0.1"
   }
 }
