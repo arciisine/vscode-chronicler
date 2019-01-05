@@ -5,7 +5,7 @@ import * as child_process from 'child_process';
 import { Log } from './log';
 
 export class Util {
-  static async processToPromise(cmd: string, args: any[], opts?: child_process.SpawnOptions) {
+  static processToPromise(cmd: string, args: any[], opts?: child_process.SpawnOptions) {
 
     Log.info([cmd, ...args].join(' '));
 

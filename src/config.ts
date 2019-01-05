@@ -137,16 +137,23 @@ export class Config {
   }
 
   static async getFFmpegBinary() {
-    // ffmpeg -i video.avi video.gif -hide_banner
-    return this.getLocation('ffmpeg-binary', {
+    if (this._config.get('chronicler.ffmpeg-binary') === 'false') {
+      return;
+    }
+    const res = await this.getLocation('ffmpeg-binary', {
       title: 'FFMpeg Binary',
       platformDefaults: {
         linux: ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg']
       },
-      folder: true,
-      validator: file => /vlc.*data/i.test(file)
+      folder: false,
+      validator: file => /ffmpeg/i.test(file)
     });
 
+    if (!res) {
+      await this._config.update('chronicler.ffmpeg-binary', 'false', vscode.ConfigurationTarget.Global);
+    }
+
+    return res;
   }
 
   static async getVlcPaths() {

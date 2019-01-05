@@ -103,7 +103,7 @@ export class VlcUtil {
       }
     );
 
-    return { finish: finish.then(x => opts.file), kill };
+    return { finish: finish.then(x => opts), kill };
   }
 
   static async connect(port: number) {

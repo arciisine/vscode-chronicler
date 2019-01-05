@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { Recorder } from './recorder';
 import { RecordingStatus } from './status';
 
 import opn = require('opn');
+import { FFmpegUtil } from './ffmpeg';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand('chronicler.stop', async () => {
     try {
-      const file = await controller.stop();
+      const { file } = await controller.stop();
       vscode.window.showInformationMessage(file, 'Open', 'Copy', 'Dismiss')
         .then(res => {
           if (res === 'Open') {

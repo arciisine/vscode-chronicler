@@ -66,7 +66,8 @@
           },
           "chronicler.ffmpeg-binary": {
             "description": "FFmpeg Binary Location",
-            "type": "string"
+            "type": "string",
+            "default": "false"
           },
           "chronicler.dest-folder": {
             "description": "Output Folder for Captures",

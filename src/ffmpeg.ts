@@ -1,29 +1,41 @@
+import * as os from 'os';
+import * as path from 'path';
+
 import { Config } from './config';
 import { Util } from './util';
 
-export interface FfmpegRecordOptions {
-  fps: string;
+export interface FFmpegRecordOptions {
+  fps: number;
   w: number;
   h: number;
   scale?: number;
 }
 
-export class FFmpegUtl {
-  static async toAnimatedGif(mp4: string, opts: FfmpegRecordOptions) {
+export class FFmpegUtil {
+  static async toAnimatedGif(mp4: string, opts: FFmpegRecordOptions) {
     const ffmpeg = await Config.getFFmpegBinary();
 
     if (!ffmpeg) {
       return;
     }
 
-    const args = ['-i', mp4, '-r', `${opts.fps}`, '-hide_banner'];
+    let vf = `fps=${opts.fps}`;
     if (opts.scale) {
-      args.push('-vf', `scale=${Math.trunc(opts.w * opts.scale)}:${Math.trunc(opts.h * opts.scale)}`);
+      vf = `${vf},scale=${Math.trunc(opts.w * opts.scale)}:${Math.trunc(opts.h * opts.scale)}`;
+    } else {
+      vf = `${vf},scale=${opts.w}:${opts.h}`;
     }
 
-    const final = mp4.replace('.mp4', '.gif');
+    vf = `${vf}:flags=lanczos`;
 
-    const { finish, kill } = await Util.processToPromise(ffmpeg, [...args, final]);
+    const paletteFile = path.resolve(os.tmpdir(), 'palette-gen.png');
+    const { finish: finishPalette } = Util.processToPromise(ffmpeg, ['-i', mp4, '-vf', `${vf},palettegen=stats_mode=diff`, '-y', paletteFile]);
+
+    await finishPalette;
+
+    const final = mp4.replace('.mp4', '.gif');
+    const { finish, kill } = Util.processToPromise(ffmpeg, ['-i', mp4, '-i', paletteFile,
+      '-lavfi', `"${vf},paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle"`, '-y', final]);
 
     return { finish: finish.then(x => final), kill };
   }

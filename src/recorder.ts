@@ -1,11 +1,12 @@
 import * as win from 'active-win';
 
-import { VlcUtil } from './vlc';
+import { VlcUtil, VlcRecordOptions } from './vlc';
+import { FFmpegUtil } from './ffmpeg';
 import { Config } from './config';
 
 export class Recorder {
 
-  private proc: { kill: (now: boolean) => void, finish: Promise<any> };
+  private proc: { kill: (now: boolean) => void, finish: Promise<VlcRecordOptions> };
   private streamStop: () => Promise<void>;
 
   get active() {
@@ -17,7 +18,7 @@ export class Recorder {
   }
 
   async start() {
-    const info = await win();
+    const { bounds } = await win();
 
     const paths = await Config.getVlcPaths();
 
@@ -25,9 +26,11 @@ export class Recorder {
       return;
     }
 
+    await Config.getFFmpegBinary();
+
     const opts = {
       ...Config.getRecordingDefaults(),
-      bounds: info.bounds!,
+      bounds: bounds!,
       file: await Config.getFilename(),
       paths
     };
@@ -40,6 +43,21 @@ export class Recorder {
     this.streamStop = await VlcUtil.connect(opts.port);
   }
 
+  async convertToGif(opts: VlcRecordOptions) {
+    const result = await FFmpegUtil.toAnimatedGif(opts.file, {
+      fps: opts.fps,
+      w: opts.bounds.width,
+      h: opts.bounds.height
+    });
+
+    if (result) {
+      const animated = await result.finish;
+      opts.file = animated;
+    }
+
+    return opts;
+  }
+
   async stop() {
     if (!this.proc) {
       throw new Error('No recording running');
@@ -47,7 +65,14 @@ export class Recorder {
     try {
       await this.streamStop();
       this.proc.kill(false);
-      return await this.proc.finish;
+
+      const opts = await this.proc.finish;
+
+      if (await Config.getFFmpegBinary()) {
+        await this.convertToGif(opts);
+      }
+
+      return opts;
     } finally {
       this.proc.kill(true);
       delete this.proc;
