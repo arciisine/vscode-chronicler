@@ -49,7 +49,9 @@ export class Config {
     validator?: (res: string) => Promise<boolean> | boolean,
     onAdd?: (file: string) => Promise<any> | any;
   }) {
-    if (!this._config.get(`chronicler.${key}`)) {
+    key = `chronicler.${key}`;
+
+    if (!this._config.get(key)) {
       const platform = os.platform();
 
       const paths = options.platformDefaults[platform as 'darwin' | 'win32'] || options.platformDefaults.linux;
@@ -76,7 +78,7 @@ export class Config {
       const file = res[0].fsPath;
 
       if ((await exists(file)) && (!options.validator || (await options.validator(file)))) {
-        await this._config.update(`chronicler.${key}`, file, vscode.ConfigurationTarget.Global);
+        await this._config.update(key, file, vscode.ConfigurationTarget.Global);
       } else {
         throw new Error(`Invalid location for ${options.title}: ${file}`);
       }
@@ -85,7 +87,7 @@ export class Config {
         await options.onAdd(file);
       }
     }
-    return this._config.get(`chronicler.${key}`) as string;
+    return this._config.get(key) as string;
   }
 
   static async getVlcBinary() {
@@ -99,9 +101,9 @@ export class Config {
       folder: false,
       onAdd: async (file) => {
         const base = path.dirname(file);
-        for (const sub of ['plugins', 'data']) {
+        for (const [sub, key] of [['plugins', 'vlc-plugins-folder'], ['share', 'vlc-data-folder']]) {
           if (await exists(path.resolve(base, sub))) {
-            await this._config.update(`chronicler.vlc-${sub}-folder`, path.resolve(base, sub));
+            await this._config.update(`chronicler.${key}`, path.resolve(base, sub), vscode.ConfigurationTarget.Global);
           }
         }
       }
@@ -122,7 +124,7 @@ export class Config {
   }
 
   static async getVlcDataFolder() {
-    return this.getLocation('data-folder', {
+    return this.getLocation('vlc-data-folder', {
       title: 'VLC Data Folder',
       platformDefaults: {
         darwin: ['/Applications/VLC.app/Contents/MacOS/data'],
