@@ -44,7 +44,7 @@ export class Config {
 
   static async getLocation(key: string, options: {
     title: string,
-    platformDefaults: { darwin: string[], win32: string[], linux: string[] },
+    platformDefaults: { darwin?: string[], win32?: string[], linux: string[] },
     folder?: boolean,
     validator?: (res: string) => Promise<boolean> | boolean,
     onAdd?: (file: string) => Promise<any> | any;
@@ -134,6 +134,19 @@ export class Config {
       folder: true,
       validator: file => /vlc.*data/i.test(file)
     });
+  }
+
+  static async getFFmpegBinary() {
+    // ffmpeg -i video.avi video.gif -hide_banner
+    return this.getLocation('ffmpeg-binary', {
+      title: 'FFMpeg Binary',
+      platformDefaults: {
+        linux: ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg']
+      },
+      folder: true,
+      validator: file => /vlc.*data/i.test(file)
+    });
+
   }
 
   static async getVlcPaths() {

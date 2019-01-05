@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
-import * as spawn from 'cross-spawn';
 import * as net from 'net';
 import { Config } from './config';
+import { Log } from './log';
+import { Util } from './util';
 
 interface Bounds {
   x: number;
@@ -27,7 +27,6 @@ export interface VlcRecordOptions {
 }
 
 export class VlcUtil {
-  static output = vscode.window.createOutputChannel('chronicler');
 
   static buildArgs(opts: VlcRecordOptions) {
 
@@ -94,46 +93,17 @@ export class VlcUtil {
   static async launchProcess(opts: VlcRecordOptions) {
     const args = VlcUtil.buildArgs(opts);
 
-    this.output.appendLine(`[INFO] ${[opts.paths.binary, ...args].join(' ')}`);
-
-    const proc = spawn(opts.paths.binary, args, {
-      cwd: vscode.workspace.workspaceFolders![0].uri.fsPath,
-      shell: true,
-      env: {
-        ...process.env,
-        VLC_PLUGIN_PATH: opts.paths.plugins,
-        VLC_DATA_PATH: opts.paths.data,
-      }
-    });
-
-    proc.stderr.on('data', x => {
-      if (Config.isDebugMode()) {
-        this.output.appendLine(`[ERROR] ${x.toString()}`.trim());
-      }
-    });
-
-    const done = () => proc.kill();
-
-    process.on('exit', done);
-
-    const finish = new Promise<string>((resolve, reject) => {
-      proc.once('error', () => {
-        reject(new Error(`Cannot find VLC at ${opts.paths.binary}`));
-      });
-
-      proc.once('exit', (code) => {
-        process.removeListener('exit', done);
-        if (code) {
-          this.output.appendLine(`[ERROR] Invalid exit status: ${code}`);
-          reject(new Error(`Invalid exit status: ${code}`));
-        } else {
-          this.output.appendLine('[INFO] Successfully terminated');
-          resolve(opts.file);
+    const { finish, kill } = await Util.processToPromise(
+      opts.paths.binary, args, {
+        env: {
+          ...process.env,
+          VLC_PLUGIN_PATH: opts.paths.plugins,
+          VLC_DATA_PATH: opts.paths.data,
         }
-      });
-    });
+      }
+    );
 
-    return { finish, kill: (now: boolean = false) => proc.kill(now ? 'SIGKILL' : 'SIGTERM') };
+    return { finish: finish.then(x => opts.file), kill };
   }
 
   static async connect(port: number) {
@@ -142,10 +112,10 @@ export class VlcUtil {
       try {
         return await new Promise<() => Promise<void>>((resolve, reject) => {
           const stream = net.connect({ port }, () => {
-            this.output.appendLine(`[INFO] Connected to: ${port}`);
+            Log.info(`Connected to: ${port}`);
             stream!.removeAllListeners('error');
             resolve(() => new Promise((res, rej) => {
-              this.output.appendLine('[INFO] Sending Quit');
+              Log.info('Sending Quit');
               stream.write('quit\r\n', (err: any) => err ? rej(err) : res());
             }));
           });
@@ -153,7 +123,7 @@ export class VlcUtil {
           stream.on('error', reject);
         });
       } catch {
-        this.output.appendLine(`[INFO] Trying to connect after ${(i + 1)}s`);
+        Log.info(`Trying to connect after ${(i + 1)}s`);
         await new Promise(r => setTimeout(r, 1000)); // Wait 1s
       }
     }

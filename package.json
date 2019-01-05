@@ -64,6 +64,10 @@
             "description": "VLC Data Folder",
             "type": "string"
           },
+          "chronicler.ffmpeg-binary": {
+            "description": "FFmpeg Binary Location",
+            "type": "string"
+          },
           "chronicler.dest-folder": {
             "description": "Output Folder for Captures",
             "type": "string"
