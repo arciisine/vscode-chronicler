@@ -65,7 +65,7 @@ export class Config {
 
       let file;
 
-      if (!options.folder && valid) {
+      if (valid) {
         file = valid;
       } else {
         const res = await vscode.window.showOpenDialog({
@@ -104,15 +104,7 @@ export class Config {
         win32: ['C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe'],
         linux: ['/usr/bin/vlc', '/usr/local/bin/vlc']
       },
-      folder: false,
-      onAdd: async (file) => {
-        const base = path.dirname(file);
-        for (const [sub, key] of [['plugins', 'vlc-plugins-folder'], ['share', 'vlc-data-folder']]) {
-          if (await exists(path.resolve(base, sub))) {
-            await this._config.update(`chronicler.${key}`, path.resolve(base, sub), vscode.ConfigurationTarget.Global);
-          }
-        }
-      }
+      folder: false
     });
   }
 
