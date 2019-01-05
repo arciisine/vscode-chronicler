@@ -18,17 +18,18 @@ export class Recorder {
 
   async start() {
     const info = await win();
-    const vlcPath = await Config.getVlcLocation();
 
-    if (!vlcPath) {
-      return; // User canceled
+    const paths = await Config.getVlcPaths();
+
+    if (!paths) {
+      return;
     }
 
     const opts = {
       ...Config.getRecordingDefaults(),
       bounds: info.bounds!,
       file: await Config.getFilename(),
-      vlcPath
+      paths
     };
 
     if (this.proc) {

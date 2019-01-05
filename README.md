@@ -19,7 +19,9 @@ This will stop the current recording, and provide a link to the final file locat
 
 ## Configuration
 The available configuration options are:
-* `chronicler.vlc-home` - This is the path to the VLC Installation Directory, will default appropriately by platform
+* `chronicler.vlc-binary` - This is the path to the VLC Binary, will default appropriately by platform
+* `chronicler.vlc-plugins-folder` - This is the path to the VLC Plugin Folder, will default appropriately by platform.
+* `chronicler.vlc-data-folder` - This is the path to the VLC Data Folder, will default appropriately by platform
 * `chronicler.dest-folder` - This is the output folder for all recordings, defaults to `$HOME/Recordings`
 * `chronicler.recording-defaults` - These are the default parameters for recording, this supports the following:
   * `port: number` - The telnet port used by vlc, defaults to `8080`

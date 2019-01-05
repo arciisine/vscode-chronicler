@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import * as spawn from 'cross-spawn';
 import * as util from 'util';
 import * as net from 'net';
@@ -13,7 +12,12 @@ interface Bounds {
 }
 
 export interface VlcRecordOptions {
-  vlcPath: string;
+  paths: {
+    binary: string;
+    plugins: string;
+    data: string;
+  };
+
   port: number;
   duration?: number;
   fps: number;
@@ -90,15 +94,15 @@ export class VlcUtil {
   static async launchProcess(opts: VlcRecordOptions) {
     const args = VlcUtil.buildArgs(opts);
 
-    this.output.appendLine(`[INFO] ${[path.resolve(opts.vlcPath, 'vlc'), ...args].join(' ')}`);
+    this.output.appendLine(`[INFO] ${[opts.paths.binary, ...args].join(' ')}`);
 
-    const proc = spawn(path.resolve(opts.vlcPath, 'vlc'), args, {
+    const proc = spawn(opts.paths.binary, args, {
       cwd: vscode.workspace.workspaceFolders![0].uri.fsPath,
       shell: true,
       env: {
         ...process.env,
-        VLC_PLUGIN_PATH: path.resolve(opts.vlcPath, 'plugins'),
-        VLC_DATA_PATH: path.resolve(opts.vlcPath, 'share'),
+        VLC_PLUGIN_PATH: opts.paths.plugins,
+        VLC_DATA_PATH: opts.paths.data,
       }
     });
 
@@ -114,7 +118,7 @@ export class VlcUtil {
 
     const finish = new Promise<string>((resolve, reject) => {
       proc.once('error', () => {
-        reject(new Error(`Cannot find VLC in ${opts.vlcPath}`));
+        reject(new Error(`Cannot find VLC at ${opts.paths.binary}`));
       });
 
       proc.once('exit', (code) => {

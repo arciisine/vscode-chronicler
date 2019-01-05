@@ -52,8 +52,16 @@
       {
         "title": "Chronicler",
         "properties": {
-          "chronicler.vlc-home": {
-            "description": "VLC Installation Directory",
+          "chronicler.vlc-binary": {
+            "description": "VLC Binary Location",
+            "type": "string"
+          },
+          "chronicler.vlc-plugins-folder": {
+            "description": "VLC Plugin Folder",
+            "type": "string"
+          },
+          "chronicler.vlc-data-folder": {
+            "description": "VLC Data Folder",
             "type": "string"
           },
           "chronicler.dest-folder": {
