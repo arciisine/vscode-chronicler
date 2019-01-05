@@ -63,19 +63,25 @@ export class Config {
         }
       }
 
-      const res = await vscode.window.showOpenDialog({
-        openLabel: `Select ${options.title}`,
-        canSelectFiles: !options.folder,
-        canSelectFolders: options.folder,
-        canSelectMany: false,
-        defaultUri: valid ? vscode.Uri.file(valid) : undefined
-      });
+      let file;
 
-      if (!res || res.length === 0) {
-        return;
+      if (!options.folder && valid) {
+        file = valid;
+      } else {
+        const res = await vscode.window.showOpenDialog({
+          openLabel: `Select ${options.title}`,
+          canSelectFiles: !options.folder,
+          canSelectFolders: options.folder,
+          canSelectMany: false,
+          defaultUri: valid ? vscode.Uri.file(valid) : undefined
+        });
+
+        if (!res || res.length === 0) {
+          return;
+        }
+
+        file = res[0].fsPath;
       }
-
-      const file = res[0].fsPath;
 
       if ((await exists(file)) && (!options.validator || (await options.validator(file)))) {
         await this._config.update(key, file, vscode.ConfigurationTarget.Global);
