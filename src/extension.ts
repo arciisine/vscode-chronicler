@@ -16,8 +16,13 @@ export function activate(context: vscode.ExtensionContext) {
   const status = new RecordingStatus();
 
   async function stop() {
-    status.stopping();
-    controller.stop();
+    if (controller.active) {
+      status.stopping();
+      controller.stop();
+    } else {
+      status.setState(false);
+      controller.stop(true);
+    }
   }
 
   async function record(opts: Partial<RecordingOptions> = {}) {
@@ -45,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showErrorMessage(e.message);
     }
 
-    if (controller.active) {
+    if (!controller.active) {
       status.setState(false);
     }
   }

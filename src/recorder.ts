@@ -60,12 +60,12 @@ export class Recorder {
     return { output: this.postProcess(opts) };
   }
 
-  async stop() {
+  stop(force = false) {
     if (!this.proc) {
       throw new Error('No recording running');
     }
     try {
-      this.proc.stop();
+      this.proc.stop(force);
     } catch {
       this.proc.stop(true);
     }
