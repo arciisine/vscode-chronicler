@@ -16,11 +16,12 @@ export class FFmpegUtil {
       'b:a': '384k',
       'c:a': 'aac',
       ac: 1,
-      vbr: 3
+      //      vbr: 3
     },
     video: {
       preset: 'ultrafast',
-      crf: 22,
+      crf: 20,
+      pix_fmt: 'yuv420p',
       'c:v': 'libx264',
     }
   };
