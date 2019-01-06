@@ -46,11 +46,11 @@ Animated GIFs are supported, if you configure `chronicler.ffmpeg-binary` appropr
 
 * [FFmpeg](https://www.ffmpeg.org/download.html).
 
-#Acknowledgements
+# Acknowledgements
 
 This project was inspired by:
 * [vscode-screen-recorder](https://github.com/wk-j/vscode-screen-recorder), providing inspiration and UI patterns.
-* [screen-recorder](https://github.com/131/screen-recorder), seeing how they used vlc for recording. 
+* [screen-recorder](https://github.com/131/screen-recorder), inspiration for how to encode the desktop.
 
 # Known Issues
 
