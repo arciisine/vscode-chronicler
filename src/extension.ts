@@ -43,7 +43,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     } catch (e) {
       vscode.window.showErrorMessage(e.message);
-    } finally {
+    }
+
+    if (controller.active) {
       status.setState(false);
     }
   }

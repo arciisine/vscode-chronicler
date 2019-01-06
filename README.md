@@ -16,7 +16,7 @@ This will initiate a new recording, and will prompt for the FFmpeg installation 
 * Accessing the command, via the command palette:
    - `Chronicler Start Recording` - Standard recording
    - `Chronicler Start Timed-Recording` - Recording with a set duration, user will be prompted, with a default of `120` seconds.
-   - `Chronicler Start Recording with Audio` - (Experimental) Standard recording with audio support
+   - `Chronicler Start Recording with Audio` - Standard recording with audio support (OSX requires a [custom build of FFmpeg](https://github.com/arciisine/vscode-chronicler/binaries/osx/ffmpeg) to bypass choppy audio.  More information on the custom build can be found [here](https://trac.ffmpeg.org/ticket/4513))
 
 * Using the predefined shortcut (by default `cmd+alt+shift+r`)
 
@@ -58,9 +58,14 @@ Calling out known issues can help limit users opening duplicate issues against y
 
 # Release Notes
 
+## 0.0.3
+Cleaned up linux support
+Provided link for ffmpeg 4.1 with patch applied for audio capture during screen recording
+UI improvements
+
 ## 0.0.2
 Added support for:
-* (Experimental) Audio recordings
+* Audio recordings
 * Status bar countdown (configurable)
 * Timed recordings
 * Dropping VLC, using FFmpeg solely, as it supports audio
