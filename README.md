@@ -3,7 +3,7 @@
   VSCode Chronicler
 </h1>
 
-Chronicler is a visual studio code plugin for recording sessions within vscode. The application relies upon [FFmpeg](https://www.ffmpeg.org/) being installed. The primary functionality of the plugin is to start and stop recording. The status bar contains an item that will provide you the current state of the recording process, and is an actionable element for starting/stopping a recording.
+Chronicler is a cross-platform visual studio code plugin for recording sessions within vscode. The application relies upon [FFmpeg](https://www.ffmpeg.org/) being installed. The primary functionality of the plugin is to start and stop recording. The status bar contains an item that will provide you the current state of the recording process, and is an actionable element for starting/stopping a recording.
 
 ![Screen Capture in Action](./images/screencast-small.gif)
 

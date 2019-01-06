@@ -23,7 +23,7 @@ export class FFmpegUtil {
     },
     video: {
       preset: 'ultrafast',
-      crf: 20,
+      crf: 10,
       pix_fmt: 'yuv420p',
       'c:v': 'libx264',
     }
@@ -42,7 +42,7 @@ export class FFmpegUtil {
 
   static async getInputDevices(opts: RecordingOptions) {
     const { bounds: b } = opts;
-    const cropFilter = `crop=${b.width}:${b.height}:${b.x}:${b.y}`
+    const cropFilter = `crop=${b.width}:${b.height}:${b.x}:${b.y}`;
 
     switch (os.platform()) {
       case 'darwin': {
@@ -122,7 +122,17 @@ export class FFmpegUtil {
     );
 
     const { finish, kill, proc } = await Util.processToPromise(opts.ffmpegBinary, [...args, opts.file]);
-    return { finish: finish.then(x => opts), kill, proc };
+    return {
+      finish: finish.then(x => opts),
+      stop: (now?: boolean) => {
+        if (now) {
+          kill(now);
+        } else {
+          proc.stdin.write('q'); // Send kill command
+        }
+      },
+      proc
+    };
   }
 
   static async generateGIF(opts: RecordingOptions & { scale?: number }) {

@@ -6,8 +6,7 @@ import { OSUtil } from './os';
 
 export class Recorder {
 
-  private proc: { proc: ChildProcess, kill: (now: boolean) => void, finish: Promise<RecordingOptions> };
-
+  private proc: { proc: ChildProcess, stop: (now?: boolean) => void, finish: Promise<RecordingOptions> };
 
   get active() {
     return !!this.proc;
@@ -29,12 +28,14 @@ export class Recorder {
 
         if (result) {
           const animated = await result.finish;
-          opts.file = animated;
+          if (!opts.audio) { // Only default to GIF is not audio
+            opts.file = animated;
+          }
         }
       }
       return opts;
     } finally {
-      this.proc.kill(true);
+      this.proc.stop(true);
       delete this.proc;
     }
   }
@@ -64,9 +65,9 @@ export class Recorder {
       throw new Error('No recording running');
     }
     try {
-      this.proc.proc.stdin.write('q');
+      this.proc.stop();
     } catch {
-      this.proc.kill(true);
+      this.proc.stop(true);
     }
   }
 }

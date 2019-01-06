@@ -49,7 +49,6 @@ export class OSUtil {
       }
     }
 
-
     return bounds!;
   }
 

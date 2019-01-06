@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
       const choice = await vscode.window.showInformationMessage(`Session output ${file}`, 'Open', 'Copy', 'Dismiss');
 
       if (choice === 'Open') {
-        opn(file, { wait: false });
+        opn(file, { wait: false, app: 'google-chrome' });
       } else if (choice === 'Copy') {
         vscode.env.clipboard.writeText(file);
       }
