@@ -58,6 +58,9 @@ Calling out known issues can help limit users opening duplicate issues against y
 
 # Release Notes
 
+## 0.0.4
+Issue with linux launching (odd pixel issue) as  well as better results launching
+
 ## 0.0.3
 Cleaned up linux support
 Provided link for ffmpeg 4.1 with patch applied for audio capture during screen recording
