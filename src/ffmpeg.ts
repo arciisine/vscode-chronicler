@@ -12,9 +12,6 @@ export class FFmpegUtil {
     common: {
       threads: 4,
     },
-    darwinCommon: {
-      capture_cursor: 1,
-    },
     audio: {
       'b:a': '384k',
       'c:a': 'aac',
@@ -30,7 +27,8 @@ export class FFmpegUtil {
   };
 
   private static get(src: any, key: string, target: any, customKeyOverride?: string) {
-    return [`-${key}`, src[customKeyOverride || key] || target[key]];
+    const val = src[customKeyOverride || key] || target[key];
+    return val === undefined ? [] : [`-${key}`, val];
   }
 
   private static getAll(src: any, target: any, keys: string[] = Object.keys(target), override?: (x: string) => string) {
@@ -40,86 +38,121 @@ export class FFmpegUtil {
     }, [] as string[]);
   }
 
-  static async getInputDevices(opts: RecordingOptions) {
-    const { bounds: b } = opts;
-    const cropFilter = `crop=${b.width}:${b.height}:${b.x}:${b.y}`;
-
-    switch (os.platform()) {
-      case 'darwin': {
-        const res = await OSUtil.getMacScreenSize();
-        return {
-          video: {
-            f: 'avfoundation',
-            i: await OSUtil.getMacInputDevices(opts.ffmpegBinary, opts.audio)
-          },
-          filter: [
-            `scale=${res.w}:${res.h}:flags=lanczos`,
-            cropFilter
-          ].join(',')
-        };
-      }
-      case 'win32': {
-        return {
-          video: {
-            f: 'dshow',
-            i: opts.audio ?
-              'video="UScreenCapture":audio="Microphone"' :
-              'video="screen-capture-recorder"'
-          },
-          filter: cropFilter
-        };
-      }
-      case 'linux': {
-        return {
-          video: { f: 'x11grab', i: `:0.0+${opts.bounds.x},${opts.bounds.y}` },
-          ...(!opts.audio ? {} : {
-            audio: { f: 'pulse', i: 'default' }
-          })
-        };
-      }
-    }
-  }
-
-  static async launchProcess(opts: RecordingOptions) {
-    const custom = opts.flags || {};
-    const platform = os.platform();
-
-    const input = await this.getInputDevices(opts);
-    if (!input) {
-      throw new Error('Unsupported platform');
-    }
-
-    const getAll = this.getAll.bind(this, custom);
-
-    const args: string[] = [
-      ...getAll(this.recordingArgs.common),
-      ...getAll((this.recordingArgs as any)[`${platform}Common`] || {}),
-      '-r', `${opts.fps}`,
-      '-video_size', `${opts.bounds.width}x${opts.bounds.height}`,
-      ...getAll(input.video, ['f']),
-      ...getAll(input.video, ['i'])
-    ];
+  static async getWin32Args(opts: RecordingOptions) {
+    const getAll = this.getAll.bind(this, opts.flags || {});
+    const devs = await OSUtil.getWinDevices(opts.ffmpegBinary, opts.audio);
+    const out: string[] = [];
 
     if (opts.duration) {
-      args.unshift('-t', `${opts.duration}`);
+      out.unshift('-t', `${opts.duration}`);
     }
 
+    out.push(
+      ...getAll(this.recordingArgs.common),
+      '-r', `${opts.fps}`,
+      '-video_size', `${opts.bounds.width}x${opts.bounds.height}`,
+    );
+
     if (opts.audio) {
-      if ('audio' in input) {
-        args.push(
-          ...getAll(input.audio, ['f'], x => `audio_${x}`),
-          ...getAll(input.audio, ['i'], x => `audio_${x}`),
-        );
-      }
-      args.push(
+      out.push(
+        '-f', 'dshow',
+        '-i', `audio="${devs.audio}"`,
+      );
+    }
+
+    out.push(
+      '-offset_x', `${opts.bounds.x}`,
+      '-offset_y', `${opts.bounds.y}`,
+      '-f', 'gdigrab',
+      '-i', 'desktop',
+      ...getAll(this.recordingArgs.video)
+    );
+
+    if (opts.audio) {
+      out.push(
         ...getAll(this.recordingArgs.audio),
       );
     }
 
-    args.push(
-      ...getAll(this.recordingArgs.video),
-      ...(input.filter ? ['-vf', `'${input.filter}'`] : [])
+    return out;
+  }
+
+  static async getDarwinArgs(opts: RecordingOptions) {
+    const { bounds: b } = opts;
+
+    const getAll = this.getAll.bind(this, opts.flags || {});
+    const res = await OSUtil.getMacScreenSize();
+    const devs = await OSUtil.getMacInputDevices(opts.ffmpegBinary, opts.audio);
+
+    const out: string[] = [];
+    if (opts.duration) {
+      out.unshift('-t', `${opts.duration}`);
+    }
+    out.push(
+      '-capture_cursor', '1',
+      ...getAll(this.recordingArgs.common),
+      '-r', `${opts.fps}`,
+      '-video_size', `${opts.bounds.width}x${opts.bounds.height}`,
+      '-f', 'avfoundation',
+      '-i', `${devs.video}:${devs.audio}`
     );
+
+    if (opts.audio) {
+      out.push(
+        ...getAll(this.recordingArgs.audio),
+      );
+    }
+
+    out.push(
+      ...getAll(this.recordingArgs.video),
+      '-vf', `'scale=${res.w}:${res.h}:flags=lanczos,crop=${b.width}:${b.height}:${b.x}:${b.y}'`
+    );
+
+    return out;
+  }
+
+  static async getLinuxArgs(opts: RecordingOptions) {
+    const getAll = this.getAll.bind(this, opts.flags || {});
+    const out: string[] = [];
+
+    if (opts.duration) {
+      out.unshift('-t', `${opts.duration}`);
+    }
+
+    out.push(
+      ...getAll(this.recordingArgs.common),
+      '-r', `${opts.fps}`,
+      '-video_size', `${opts.bounds.width}x${opts.bounds.height}`,
+      '-f', 'x11grab',
+      '-i', `:0.0+${opts.bounds.x},${opts.bounds.y}`,
+    );
+
+    if (opts.audio) {
+      out.push(
+        '-f', 'pulse',
+        '-i', 'default',
+        ...getAll(this.recordingArgs.audio),
+      );
+    }
+
+    out.push(
+      ...getAll(this.recordingArgs.video),
+    );
+
+    return out;
+  }
+
+  static async launchProcess(opts: RecordingOptions) {
+    const platform = os.platform();
+    let args: string[];
+
+    switch (platform) {
+      case 'win32': args = await this.getWin32Args(opts); break;
+      case 'darwin': args = await this.getDarwinArgs(opts); break;
+      case 'linux':
+      default:
+        args = await this.getLinuxArgs(opts); break;
+    }
 
     const { finish, kill, proc } = await Util.processToPromise(opts.ffmpegBinary, [...args, opts.file]);
     return {

@@ -59,10 +59,10 @@ Calling out known issues can help limit users opening duplicate issues against y
 # Release Notes
 
 ## 0.0.5
-Released windows compatibility
+Released windows compatibility, reworked ffmpeg argument generation to tailor to each platform better.
 
 ## 0.0.4
-Issue with linux launching (odd pixel issue) as  well as better results launching
+Issue with linux launching (odd/even pixel issue) as  well as better results launching
 
 ## 0.0.3
 Cleaned up linux support

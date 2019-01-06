@@ -1,5 +1,6 @@
 import * as win from 'active-win';
 import * as os from 'os';
+import * as path from 'path';
 import opn = require('opn');
 
 import { Util } from './util';
@@ -10,14 +11,24 @@ export class OSUtil {
     const platform = os.platform();
     await opn(file, {
       wait: false,
-      app: platform === 'darwin' ? 'google chrome' : 'google-chrome'
+      app: platform === 'darwin' ? 'google chrome' : (platform === 'linux' ? 'google-chrome' : 'chrome')
     });
   }
 
   static async getBounds() {
-    const info = await win();
-    let bounds = info.bounds!;
     const platform = os.platform();
+    let info: win.Result;
+
+    if (platform === 'win32') { // Run in separate process, as it uses ffi-napi, and is incompatible with vscode's electron
+      info = JSON.parse(
+        (await Util.processToStd('node', [path.resolve(__dirname, 'active-win-run')], { cwd: process.cwd() }, true)
+        ).stdout.trim()
+      );
+    } else {
+      info = await win();
+    }
+
+    let bounds = info.bounds!;
 
     if (!bounds) {
       switch (platform) {
@@ -57,28 +68,41 @@ export class OSUtil {
       if (bounds.y % 2) {
         bounds.y -= 1;
       }
+    } else if (platform === 'win32') {
+      bounds.x += 16;
+      bounds.y += 16;
+      bounds.height -= 8;
+      bounds.width -= 8;
     }
 
     return bounds!;
   }
 
-  static async getMacInputDevices(ffmpegBinary: string, audio?: boolean) {
+  static async getMacInputDevices(ffmpegBinary: string, audio = false) {
     const { stderr: text } = await Util.processToStd(ffmpegBinary, ['-f', 'avfoundation', '-list_devices', 'true', '-i', '""']);
     const matchedIndex = text.match(/\[(\d+)\]\s+Capture\s+Screen/i)!;
     if (!matchedIndex) {
       throw new Error('Cannot find screen recording device');
     }
     const videoIndex = matchedIndex[1].toString();
-    if (!audio) {
-      return `'${videoIndex}:none'`;
-    } else {
+    let audioIndex = 'none';
+    if (audio) {
       const matchedAudioIndex = text.match(/\[(\d+)\]\s+Mac[^\n]*Microphone/i)!;
       if (!matchedAudioIndex) {
         throw new Error('Cannot find microphone recording device');
       }
-      const audioIndex = matchedAudioIndex[1].toString();
-      return `'${videoIndex}:${audioIndex}'`;
+      audioIndex = matchedAudioIndex[1].toString();
     }
+    return { video: videoIndex, audio: audioIndex };
+  }
+
+  static async getWinDevices(ffmpegBinary: string, audio = false) {
+    const { stderr: text } = await Util.processToStd(ffmpegBinary, ['-f', 'dshow', '-list_devices', 'true', '-i', 'dummy']);
+    const matchedAudio = text.match(/\"(Microphone[^"]+)"/i)!;
+    if (!matchedAudio) {
+      throw new Error('Cannot find microphone recording device');
+    }
+    return { audio: matchedAudio[1].toString() };
   }
 
   static async getMacScreenSize() {
