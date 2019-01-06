@@ -4,12 +4,15 @@ import * as path from 'path';
 import { Config } from './config';
 import { Util } from './util';
 import { RecordingOptions } from './types';
+import { OSUtil } from './os';
 
 export class FFmpegUtil {
 
   static recordingArgs = {
     common: {
       threads: 4,
+    },
+    darwinCommon: {
       capture_cursor: 1,
     },
     audio: {
@@ -37,51 +40,22 @@ export class FFmpegUtil {
     }, [] as string[]);
   }
 
-  static async getMacInputDevices(opts: RecordingOptions) {
-    const { finish, proc } = Util.processToPromise(opts.ffmpegBinary, ['-f', 'avfoundation', '-list_devices', 'true', '-i', '""']);
-    proc.stderr.removeAllListeners('data');
-    const lines: Buffer[] = [];
-    proc.stderr.on('data', buffer => lines.push(buffer));
-    try {
-      await finish;
-    } catch (e) {
-      // Expect an error code
-    }
-    const text = Buffer.concat(lines).toString();
-    const matchedIndex = text.match(/\[(\d+)\]\s+Capture\s+Screen/i)!;
-    if (!matchedIndex) {
-      throw new Error('Cannot find screen recording device');
-    }
-    const videoIndex = matchedIndex[1].toString();
-    if (!opts.audio) {
-      return `'${videoIndex}:none'`;
-    } else {
-      const matchedAudioIndex = text.match(/\[(\d+)\]\s+Mac[^\n]*Microphone/i)!;
-      if (!matchedAudioIndex) {
-        throw new Error('Cannot find microphone recording device');
-      }
-      const audioIndex = matchedAudioIndex[1].toString();
-      return `'${videoIndex}:${audioIndex}'`;
-    }
-  }
-
   static async getInputDevices(opts: RecordingOptions) {
+    const { bounds: b } = opts;
+    const cropFilter = `crop=${b.width}:${b.height}:${b.x}:${b.y}`
+
     switch (os.platform()) {
       case 'darwin': {
-        const { proc, finish } = await Util.processToPromise('osascript', ['-e', `'tell application "Finder" to get bounds of window of desktop'`]);
-        let w: number = 0, h: number = 0;
-        proc.stdout.on('data', v => {
-          [, , w, h] = v.toString().split(/\s*,\s*/);
-          w = parseInt(`${w}`, 10);
-          h = parseInt(`${h}`, 10);
-        });
-        await finish;
+        const res = await OSUtil.getMacScreenSize();
         return {
-          resolution: { w, h },
           video: {
             f: 'avfoundation',
-            i: await this.getMacInputDevices(opts)
-          }
+            i: await OSUtil.getMacInputDevices(opts.ffmpegBinary, opts.audio)
+          },
+          filter: [
+            `scale=${res.w}:${res.h}:flags=lanczos`,
+            cropFilter
+          ].join(',')
         };
       }
       case 'win32': {
@@ -91,12 +65,13 @@ export class FFmpegUtil {
             i: opts.audio ?
               'video="UScreenCapture":audio="Microphone"' :
               'video="screen-capture-recorder"'
-          }
+          },
+          filter: cropFilter
         };
       }
       case 'linux': {
         return {
-          video: { f: 'x11grab', i: `:0.0` },
+          video: { f: 'x11grab', i: `:0.0+${opts.bounds.x},${opts.bounds.y}` },
           ...(!opts.audio ? {} : {
             audio: { f: 'pulse', i: 'default' }
           })
@@ -107,6 +82,7 @@ export class FFmpegUtil {
 
   static async launchProcess(opts: RecordingOptions) {
     const custom = opts.flags || {};
+    const platform = os.platform();
 
     const input = await this.getInputDevices(opts);
     if (!input) {
@@ -117,6 +93,7 @@ export class FFmpegUtil {
 
     const args: string[] = [
       ...getAll(this.recordingArgs.common),
+      ...getAll((this.recordingArgs as any)[`${platform}Common`] || {}),
       '-r', `${opts.fps}`,
       '-video_size', `${opts.bounds.width}x${opts.bounds.height}`,
       ...getAll(input.video, ['f']),
@@ -139,13 +116,9 @@ export class FFmpegUtil {
       );
     }
 
-    let vf = `crop=${opts.bounds.width}:${opts.bounds.height}:${opts.bounds.x}:${opts.bounds.y}`;
-    if (input.resolution) {
-      vf = `scale=${input.resolution.w}:${input.resolution.h}:flags=lanczos,${vf}`;
-    }
     args.push(
       ...getAll(this.recordingArgs.video),
-      '-vf', `'${vf}'`
+      ...(input.filter ? ['-vf', `'${input.filter}'`] : [])
     );
 
     const { finish, kill, proc } = await Util.processToPromise(opts.ffmpegBinary, [...args, opts.file]);

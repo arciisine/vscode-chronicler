@@ -56,4 +56,28 @@ export class Util {
 
     return { finish, kill, proc };
   }
+
+  static async processToStd(cmd: string, args: string[], opts?: child_process.SpawnOptions, throwError = false) {
+    const { proc, finish } = await this.processToPromise(cmd, args, opts);
+    const output = { stdout: [] as Buffer[], stderr: [] as Buffer[], success: false };
+    proc.stderr.removeAllListeners('data');
+
+    proc.stdout.on('data', v => output.stdout.push(v));
+    proc.stderr.on('data', v => output.stderr.push(v));
+
+    try {
+      await finish;
+      output.success = true;
+    } catch (e) {
+      if (throwError) {
+        throw new Error(Buffer.concat(output.stderr).toString());
+      }
+    }
+
+    return {
+      success: output.success,
+      stderr: Buffer.concat(output.stderr).toString(),
+      stdout: Buffer.concat(output.stdout).toString()
+    };
+  }
 }

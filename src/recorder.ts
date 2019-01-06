@@ -1,13 +1,13 @@
-import * as win from 'active-win';
-
 import { FFmpegUtil } from './ffmpeg';
 import { Config } from './config';
 import { RecordingOptions } from './types';
 import { ChildProcess } from 'child_process';
+import { OSUtil } from './os';
 
 export class Recorder {
 
   private proc: { proc: ChildProcess, kill: (now: boolean) => void, finish: Promise<RecordingOptions> };
+
 
   get active() {
     return !!this.proc;
@@ -40,15 +40,13 @@ export class Recorder {
   }
 
   async run(override: Partial<RecordingOptions> = {}) {
-    const { bounds } = await win();
-
     const binary = (await Config.getFFmpegBinary())!;
 
     const opts = {
       ...Config.getRecordingDefaults(),
-      bounds: bounds!,
       file: await Config.getFilename(),
       ...override,
+      bounds: await OSUtil.getBounds(),
       ffmpegBinary: binary
     };
 
