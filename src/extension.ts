@@ -3,25 +3,25 @@ import * as vscode from 'vscode';
 import { Recorder } from './recorder';
 import { RecordingStatus } from './status';
 
-import opn = require('opn');
 import { Util } from './util';
 import { RecordingOptions } from './types';
 import { Config } from './config';
+import { OSUtil } from './os';
 
 export function activate(context: vscode.ExtensionContext) {
 
   Util.context = context;
 
-  const controller = new Recorder();
+  const recorder = new Recorder();
   const status = new RecordingStatus();
 
   async function stop() {
-    if (controller.active) {
+    if (recorder.active) {
       status.stopping();
-      controller.stop();
+      recorder.stop();
     } else {
       status.setState(false);
-      controller.stop(true);
+      recorder.stop(true);
     }
   }
 
@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
       await status.countDown();
-      const run = await controller.run(opts)!;
+      const run = await recorder.run(opts)!;
       status.recording();
 
       const { file } = (await run.output)!;
@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
       const choice = await vscode.window.showInformationMessage(`Session output ${file}`, 'Open', 'Copy', 'Dismiss');
 
       if (choice === 'Open') {
-        opn(file, { wait: false, app: 'google-chrome' });
+        await OSUtil.openFile(file);
       } else if (choice === 'Copy') {
         vscode.env.clipboard.writeText(file);
       }
@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showErrorMessage(e.message);
     }
 
-    if (!controller.active) {
+    if (!recorder.active) {
       status.setState(false);
     }
   }
@@ -68,5 +68,5 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  context.subscriptions.push(controller, status);
+  context.subscriptions.push(recorder, status);
 }

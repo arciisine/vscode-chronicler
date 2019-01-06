@@ -1,8 +1,18 @@
 import * as win from 'active-win';
 import * as os from 'os';
+import opn = require('opn');
+
 import { Util } from './util';
 
 export class OSUtil {
+
+  static async openFile(file: string) {
+    const platform = os.platform();
+    await opn(file, {
+      wait: false,
+      app: platform === 'darwin' ? 'google chrome' : 'google-chrome'
+    });
+  }
 
   static async getBounds() {
     const info = await win();
@@ -42,10 +52,10 @@ export class OSUtil {
         bounds.height += 1;
       }
       if (bounds.x % 2) {
-        bounds.x += 1;
+        bounds.x -= 1;
       }
       if (bounds.y % 2) {
-        bounds.y += 1;
+        bounds.y -= 1;
       }
     }
 
