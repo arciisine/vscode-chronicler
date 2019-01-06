@@ -46,8 +46,10 @@ export class Config {
 
   static async getLocation(key: string, options: {
     title: string,
-    platformDefaults: { darwin?: string[], win32?: string[], linux: string[] },
     folder?: boolean,
+    defaultName?: string;
+    executable?: boolean;
+    platformDefaults?: { darwin?: string[], win32?: string[], linux?: string[] },
     validator?: (res: string) => Promise<boolean> | boolean,
     onAdd?: (file: string) => Promise<any> | any;
   }) {
@@ -56,12 +58,27 @@ export class Config {
     if (!this._config.get(key)) {
       const platform = os.platform();
 
-      const paths = options.platformDefaults[platform as 'darwin' | 'win32'] || options.platformDefaults.linux;
+      const folders = options.platformDefaults ? (options.platformDefaults[platform as 'darwin' | 'win32'] || options.platformDefaults.linux || []) : [];
+
       let valid = undefined;
-      for (const p of paths) {
-        if (await exists(p)) {
-          valid = p;
-          break;
+
+      if (options.folder) {
+        for (const p of folders) {
+          if (await exists(p)) {
+            valid = p;
+            break;
+          }
+        }
+      } else if (options.defaultName) {
+        const paths = [...folders];
+        if (options.executable) {
+          paths.unshift(...(process.env.PATH || '').split(path.delimiter));
+        }
+        for (const p of paths) {
+          if (await exists(path.resolve(p, options.defaultName))) {
+            valid = p;
+            break;
+          }
         }
       }
 
@@ -101,10 +118,9 @@ export class Config {
   static async getFFmpegBinary() {
     const res = await this.getLocation('ffmpeg-binary', {
       title: 'FFMpeg Binary',
-      platformDefaults: {
-        linux: ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg']
-      },
       folder: false,
+      defaultName: 'ffmpeg',
+      executable: true,
       validator: file => /ffmpeg/i.test(file)
     });
 
