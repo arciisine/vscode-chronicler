@@ -72,10 +72,13 @@ export class Config {
       } else if (options.defaultName) {
         const paths = [...folders];
         if (options.executable) {
-          paths.unshift(...(process.env.PATH || '').split(path.delimiter));
+          paths.unshift(...(process.env.PATH || '')
+            .split(path.delimiter)
+            .map(x => path.resolve(x, options.defaultName!))
+          );
         }
         for (const p of paths) {
-          if (await exists(path.resolve(p, options.defaultName))) {
+          if (await exists(p)) {
             valid = p;
             break;
           }
@@ -116,18 +119,12 @@ export class Config {
   }
 
   static async getFFmpegBinary() {
-    const res = await this.getLocation('ffmpeg-binary', {
+    return this.getLocation('ffmpeg-binary', {
       title: 'FFMpeg Binary',
       folder: false,
       defaultName: 'ffmpeg',
       executable: true,
       validator: file => /ffmpeg/i.test(file)
     });
-
-    if (!res) {
-      await this._config.update('chronicler.ffmpeg-binary', 'false', vscode.ConfigurationTarget.Global);
-    }
-
-    return res;
   }
 }

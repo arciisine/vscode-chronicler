@@ -28,8 +28,10 @@ export function activate(context: vscode.ExtensionContext) {
   async function record(opts: Partial<RecordingOptions> = {}) {
     try {
       if (!(await Config.getFFmpegBinary())) {
+        vscode.window.showWarningMessage('FFmpeg binary location not defined, cannot record unless path is set.');
         return;
       }
+
       await status.countDown();
       const run = await recorder.run(opts)!;
       status.recording();

@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Visual Studio Session Recorder",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "arcsine",
   "repository": {
     "type": "git",

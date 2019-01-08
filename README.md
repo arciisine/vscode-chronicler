@@ -54,9 +54,12 @@ This project was inspired by:
 
 # Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Currently the plugin does not work properly with a multi-screen setup, and is being actively worked on.
 
 # Release Notes
+
+## 0.0.5
+Bug fix with respect to binary location detection, and handling.
 
 ## 0.0.5
 Released windows compatibility, reworked ffmpeg argument generation to tailor to each platform better.
