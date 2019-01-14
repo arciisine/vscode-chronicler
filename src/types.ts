@@ -1,3 +1,5 @@
+import * as win from '@arcsine/active-win';
+
 export interface Bounds {
   x: number;
   y: number;
@@ -8,7 +10,7 @@ export interface Bounds {
 export interface RecordingOptions {
   ffmpegBinary: string;
   fps: number;
-  bounds: Bounds;
+  window: win.Results;
   file: string;
 
   animatedGif?: boolean;

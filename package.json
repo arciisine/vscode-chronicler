@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Visual Studio Session Recorder",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
@@ -103,13 +103,12 @@
   "devDependencies": {
     "@types/node": "^10.12.18",
     "typescript": "^3.2.2",
-    "vscode": "^1.1.26"
+    "vscode": "^1.1.26",
+    "@types/cross-spawn": "^6.0.0",
+    "@types/opn": "^5.1.0"
   },
   "dependencies": {
-    "@types/active-win": "^4.0.0",
-    "@types/cross-spawn": "^6.0.0",
-    "@types/opn": "^5.1.0",
-    "active-win": "^4.0.0",
+    "@arcsine/active-win": "^5.0.0",
     "cross-spawn": "^6.0.5",
     "opn": "^5.4.0"
   }

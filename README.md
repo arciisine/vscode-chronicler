@@ -58,7 +58,7 @@ Currently the plugin does not work properly with a multi-screen setup, and is be
 
 # Release Notes
 
-## 0.0.5
+## 0.0.6
 Bug fix with respect to binary location detection, and handling.
 
 ## 0.0.5

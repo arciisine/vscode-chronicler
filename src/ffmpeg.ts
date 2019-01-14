@@ -42,6 +42,7 @@ export class FFmpegUtil {
     const getAll = this.getAll.bind(this, opts.flags || {});
     const devs = await OSUtil.getWinDevices(opts.ffmpegBinary, opts.audio);
     const out: string[] = [];
+    const win = opts.window;
 
     if (opts.duration) {
       out.unshift('-t', `${opts.duration}`);
@@ -50,7 +51,7 @@ export class FFmpegUtil {
     out.push(
       ...getAll(this.recordingArgs.common),
       '-r', `${opts.fps}`,
-      '-video_size', `${opts.bounds.width}x${opts.bounds.height}`,
+      '-video_size', `${win.bounds.width}x${win.bounds.height}`,
     );
 
     if (opts.audio) {
@@ -61,8 +62,8 @@ export class FFmpegUtil {
     }
 
     out.push(
-      '-offset_x', `${opts.bounds.x}`,
-      '-offset_y', `${opts.bounds.y}`,
+      '-offset_x', `${win.bounds.x}`,
+      '-offset_y', `${win.bounds.y}`,
       '-f', 'gdigrab',
       '-i', 'desktop',
       ...getAll(this.recordingArgs.video)
@@ -78,11 +79,10 @@ export class FFmpegUtil {
   }
 
   static async getDarwinArgs(opts: RecordingOptions) {
-    const { bounds: b } = opts;
+    const { window: { bounds, screens: [screen] } } = opts;
 
     const getAll = this.getAll.bind(this, opts.flags || {});
-    const res = await OSUtil.getMacScreenSize();
-    const devs = await OSUtil.getMacInputDevices(opts.ffmpegBinary, opts.audio);
+    const devs = await OSUtil.getMacInputDevices(opts.ffmpegBinary, opts.window, opts.audio);
 
     const out: string[] = [];
     if (opts.duration) {
@@ -92,7 +92,7 @@ export class FFmpegUtil {
       '-capture_cursor', '1',
       ...getAll(this.recordingArgs.common),
       '-r', `${opts.fps}`,
-      '-video_size', `${opts.bounds.width}x${opts.bounds.height}`,
+      // '-video_size', `${bounds.width}x${bounds.height}`,
       '-f', 'avfoundation',
       '-i', `${devs.video}:${devs.audio}`
     );
@@ -105,7 +105,7 @@ export class FFmpegUtil {
 
     out.push(
       ...getAll(this.recordingArgs.video),
-      '-vf', `'scale=${res.w}:${res.h}:flags=lanczos,crop=${b.width}:${b.height}:${b.x}:${b.y}'`
+      '-vf', `'scale=${screen.width}:${screen.height}:flags=lanczos,crop=${bounds.width}:${bounds.height}:${Math.abs(screen.x - bounds.x)}:${Math.abs(screen.y - bounds.y)}'`
     );
 
     return out;
@@ -114,6 +114,8 @@ export class FFmpegUtil {
   static async getLinuxArgs(opts: RecordingOptions) {
     const getAll = this.getAll.bind(this, opts.flags || {});
     const out: string[] = [];
+    const { bounds, screens } = opts.window;
+    const [screen] = screens;
 
     if (opts.duration) {
       out.unshift('-t', `${opts.duration}`);
@@ -122,9 +124,9 @@ export class FFmpegUtil {
     out.push(
       ...getAll(this.recordingArgs.common),
       '-r', `${opts.fps}`,
-      '-video_size', `${opts.bounds.width}x${opts.bounds.height}`,
+      '-video_size', `${bounds.width}x${bounds.height}`,
       '-f', 'x11grab',
-      '-i', `:0.0+${opts.bounds.x},${opts.bounds.y}`,
+      '-i', `:0.0+${bounds.x},${bounds.y}`,
     );
 
     if (opts.audio) {
@@ -143,15 +145,13 @@ export class FFmpegUtil {
   }
 
   static async launchProcess(opts: RecordingOptions) {
-    const platform = os.platform();
     let args: string[];
 
-    switch (platform) {
+    switch (process.platform) {
       case 'win32': args = await this.getWin32Args(opts); break;
       case 'darwin': args = await this.getDarwinArgs(opts); break;
-      case 'linux':
-      default:
-        args = await this.getLinuxArgs(opts); break;
+      case 'linux': args = await this.getLinuxArgs(opts); break;
+      default: throw new Error('Unsupported platform');
     }
 
     const { finish, kill, proc } = await Util.processToPromise(opts.ffmpegBinary, [...args, opts.file]);
@@ -175,11 +175,13 @@ export class FFmpegUtil {
       return;
     }
 
+    const { bounds } = opts.window;
+
     let vf = `fps=${opts.fps}`;
     if (opts.scale) {
-      vf = `${vf},scale=${Math.trunc(opts.bounds.width * opts.scale)}:${Math.trunc(opts.bounds.height * opts.scale)}`;
+      vf = `${vf},scale=${Math.trunc(bounds.width * opts.scale)}:${Math.trunc(bounds.height * opts.scale)}`;
     } else {
-      vf = `${vf},scale=${opts.bounds.width}:${opts.bounds.height}`;
+      vf = `${vf},scale=${bounds.width}:${bounds.height}`;
     }
 
     vf = `${vf}:flags=lanczos`;

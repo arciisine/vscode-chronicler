@@ -47,7 +47,7 @@ export class Recorder {
       ...Config.getRecordingDefaults(),
       file: await Config.getFilename(),
       ...override,
-      bounds: await OSUtil.getBounds(),
+      window: await OSUtil.getActiveWindow(),
       ffmpegBinary: binary
     };
 
