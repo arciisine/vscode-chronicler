@@ -79,10 +79,14 @@ export class FFmpegUtil {
   }
 
   static async getDarwinArgs(opts: RecordingOptions) {
-    const { window: { bounds, screens: [screen] } } = opts;
+    const { window: { bounds, screens } } = opts;
 
     const getAll = this.getAll.bind(this, opts.flags || {});
     const devs = await OSUtil.getMacInputDevices(opts.ffmpegBinary, opts.window, opts.audio);
+
+    const screen = screens.find(s => // Grab screen which has the top-left corner
+      bounds.x >= s.x && bounds.x <= s.x + s.width &&
+      bounds.y >= s.y && bounds.y <= s.y + s.height)!;
 
     const out: string[] = [];
     if (opts.duration) {
@@ -114,8 +118,7 @@ export class FFmpegUtil {
   static async getLinuxArgs(opts: RecordingOptions) {
     const getAll = this.getAll.bind(this, opts.flags || {});
     const out: string[] = [];
-    const { bounds, screens } = opts.window;
-    const [screen] = screens;
+    const { bounds } = opts.window;
 
     if (opts.duration) {
       out.unshift('-t', `${opts.duration}`);
