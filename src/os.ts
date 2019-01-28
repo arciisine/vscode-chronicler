@@ -1,4 +1,4 @@
-import * as win from '@arcsine/active-win';
+import * as win from '@arcsine/process-win';
 
 import { Util } from './util';
 
@@ -19,7 +19,7 @@ export class OSUtil {
   }
 
   static async getActiveWindow() {
-    const info = await win();
+    const info = await win.getActive();
     const b = info.bounds!;
 
     if (process.platform !== 'darwin') {
@@ -32,7 +32,7 @@ export class OSUtil {
     return info!;
   }
 
-  static async getMacInputDevices(ffmpegBinary: string, window: win.Results, audio = false) {
+  static async getMacInputDevices(ffmpegBinary: string, window: win.Response, audio = false) {
     const { stderr: text } = await Util.processToStd(ffmpegBinary, ['-f', 'avfoundation', '-list_devices', 'true', '-i', '""']);
     const matched: string[] = [];
     text.replace(/\[(\d+)\]\s+Capture\s+Screen/ig, (all, index: string) => {
