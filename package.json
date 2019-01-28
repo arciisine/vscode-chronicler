@@ -103,13 +103,9 @@
   "devDependencies": {
     "@types/node": "^10.12.18",
     "typescript": "^3.2.2",
-    "vscode": "^1.1.26",
-    "@types/cross-spawn": "^6.0.0",
-    "@types/opn": "^5.1.0"
+    "vscode": "^1.1.26"
   },
   "dependencies": {
-    "@arcsine/active-win": "^5.0.0",
-    "cross-spawn": "^6.0.5",
-    "opn": "^5.4.0"
+    "@arcsine/active-win": "^5.0.2"
   }
 }

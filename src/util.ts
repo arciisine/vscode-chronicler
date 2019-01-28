@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as spawn from 'cross-spawn';
 import * as child_process from 'child_process';
 import * as path from 'path';
 
@@ -16,7 +15,7 @@ export class Util {
 
     Log.info([cmd, ...args].join(' '));
 
-    const proc = spawn(cmd, args, {
+    const proc = child_process.spawn(cmd, args, {
       cwd: vscode.workspace.workspaceFolders![0].uri.fsPath,
       shell: true,
       ...opts

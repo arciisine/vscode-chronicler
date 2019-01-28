@@ -1,16 +1,21 @@
 import * as win from '@arcsine/active-win';
-import opn = require('opn');
 
 import { Util } from './util';
 
 export class OSUtil {
 
   static async openFile(file: string) {
-    const { platform } = process;
-    await opn(file, {
-      wait: false,
-      app: platform === 'darwin' ? 'google chrome' : (platform === 'linux' ? 'google-chrome' : 'chrome')
-    });
+    let cmd: string;
+    const args: string[] = [`file://${file.replace(/[\\/]+/g, '/')}`];
+    if (process.platform === 'darwin') {
+      cmd = 'open';
+    } else if (process.platform === 'win32') {
+      cmd = 'cmd';
+      args.unshift('/c', 'start');
+    } else {
+      cmd = 'xdg-open';
+    }
+    await Util.processToPromise(cmd, args);
   }
 
   static async getActiveWindow() {
