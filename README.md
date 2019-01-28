@@ -58,6 +58,10 @@ Currently the plugin does not work properly with a multi-screen setup, and is be
 
 # Release Notes
 
+
+## 0.0.8
+Aligned screen support with @arcsine/active-win, pulling in support for X11 vs linux.  Additionally support for multiple displays.
+
 ## 0.0.6
 Bug fix with respect to binary location detection, and handling.
 

@@ -115,7 +115,7 @@ export class FFmpegUtil {
     return out;
   }
 
-  static async getLinuxArgs(opts: RecordingOptions) {
+  static async getX11Args(opts: RecordingOptions) {
     const getAll = this.getAll.bind(this, opts.flags || {});
     const out: string[] = [];
     const { bounds } = opts.window;
@@ -153,8 +153,9 @@ export class FFmpegUtil {
     switch (process.platform) {
       case 'win32': args = await this.getWin32Args(opts); break;
       case 'darwin': args = await this.getDarwinArgs(opts); break;
-      case 'linux': args = await this.getLinuxArgs(opts); break;
-      default: throw new Error('Unsupported platform');
+      default:
+        args = await this.getX11Args(opts);
+        break;
     }
 
     const { finish, kill, proc } = await Util.processToPromise(opts.ffmpegBinary, [...args, opts.file]);

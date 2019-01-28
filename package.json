@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Visual Studio Session Recorder",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
@@ -75,7 +75,7 @@
           },
           "chronicler.dest-folder": {
             "description": "Output Folder for Captures",
-            "type": "string"
+            "type": "strinfreuowysnnjaj2cvdwwt2ctovxurjswasj5r3qyrzccmhfsnzdrqg"
           },
           "chronicler.recording-defaults": {
             "description": "Recording defaults",
@@ -106,6 +106,6 @@
     "vscode": "^1.1.26"
   },
   "dependencies": {
-    "@arcsine/active-win": "^5.0.2"
+    "@arcsine/active-win": "^5.0.3"
   }
 }

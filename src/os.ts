@@ -22,7 +22,7 @@ export class OSUtil {
     const info = await win();
     const b = info.bounds!;
 
-    if (process.platform === 'linux') {
+    if (process.platform !== 'darwin') {
       b.width += (b.width % 2);
       b.height += (b.height % 2);
       b.x -= (b.x % 2);
@@ -60,9 +60,14 @@ export class OSUtil {
   static async getWinDevices(ffmpegBinary: string, audio = false) {
     const { stderr: text } = await Util.processToStd(ffmpegBinary, ['-f', 'dshow', '-list_devices', 'true', '-i', 'dummy']);
     const matchedAudio = text.match(/\"(Microphone[^"]+)"/ig)!;
-    if (!matchedAudio) {
-      throw new Error('Cannot find microphone recording device');
+    const out: { audio?: string, video?: string } = {};
+    if (audio) {
+      if (!matchedAudio) {
+        throw new Error('Cannot find microphone recording device');
+      } else {
+        out.audio = matchedAudio[1].toString();
+      }
     }
-    return { audio: matchedAudio[1].toString() };
+    return out;
   }
 }

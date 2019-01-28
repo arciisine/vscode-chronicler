@@ -31,7 +31,7 @@ export class Config {
       await this._config.update('chronicler.dest-folder', '~/Recordings', vscode.ConfigurationTarget.Global);
     }
 
-    return (this._config.get('chronicler.dest-folder') as string).replace(/^~/, process.env.HOME || process.env.USER_PROFILE || '.');
+    return (this._config.get('chronicler.dest-folder') as string).replace(/^~/, process.env.HOME || process.env.USERPROFILE || '.');
   }
 
   static async getFilename() {
@@ -52,7 +52,7 @@ export class Config {
     folder?: boolean,
     defaultName?: string;
     executable?: boolean;
-    platformDefaults?: { darwin?: string[], win32?: string[], linux?: string[] },
+    platformDefaults?: { darwin?: string[], win32?: string[], x11?: string[] },
     validator?: (res: string) => Promise<boolean> | boolean,
     onAdd?: (file: string) => Promise<any> | any;
   }) {
@@ -61,7 +61,7 @@ export class Config {
     if (!this._config.get(key)) {
       const platform = os.platform();
 
-      const folders = options.platformDefaults ? (options.platformDefaults[platform as 'darwin' | 'win32'] || options.platformDefaults.linux || []) : [];
+      const folders = options.platformDefaults ? (options.platformDefaults[platform as 'darwin' | 'win32'] || options.platformDefaults.x11 || []) : [];
 
       let valid = undefined;
 
