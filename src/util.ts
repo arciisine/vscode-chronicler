@@ -7,6 +7,11 @@ import { Log } from './log';
 export class Util {
   static context: vscode.ExtensionContext;
 
+  static getWorkspacePath() {
+    const folders = vscode.workspace.workspaceFolders;
+    return folders ? folders![0].uri.fsPath : undefined;
+  }
+
   static getResource(rel: string) {
     return path.resolve(this.context.extensionPath, rel.replace(/\//g, path.sep)).replace(/\\/g, '/');
   }
@@ -16,7 +21,7 @@ export class Util {
     Log.info([cmd, ...args].join(' '));
 
     const proc = child_process.spawn(cmd, args, {
-      cwd: vscode.workspace.workspaceFolders![0].uri.fsPath,
+      cwd: this.getWorkspacePath() || process.cwd(),
       shell: true,
       ...opts
     });
