@@ -26,13 +26,16 @@ export class Config {
     } as RecordingOptions;
   }
 
-  static async getFilename() {
+  static async getDestFolder() {
     if (!this._config.get('chronicler.dest-folder')) {
-      await this._config.update('chronicler.dest-folder',
-        path.join(process.env.HOME || process.env.USERPROFILE || '.', 'Recordings'), vscode.ConfigurationTarget.Global);
+      await this._config.update('chronicler.dest-folder', '~/Recordings', vscode.ConfigurationTarget.Global);
     }
 
-    const dir = this._config.get('chronicler.dest-folder') as string;
+    return (this._config.get('chronicler.dest-folder') as string).replace(/^~/, process.env.HOME || process.env.USER_PROFILE || '.');
+  }
+
+  static async getFilename() {
+    const dir = await this.getDestFolder();
     const folders = vscode.workspace.workspaceFolders;
     const ws = folders ? folders![0].name.replace(/[^A-Za-z0-9\-_]+/g, '_') : `vscode`;
     const base = `${ws}-${new Date().getTime()}.mp4`;
