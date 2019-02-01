@@ -1,12 +1,16 @@
-import { FFmpegUtil } from './ffmpeg';
+import { Recorder as ScreenRecorder, RecordingOptions as Recop, GIFCreator } from '@arcsine/screen-recorder';
+
 import { Config } from './config';
 import { RecordingOptions } from './types';
 import { ChildProcess } from 'child_process';
-import { OSUtil } from './os';
 
 export class Recorder {
 
-  private proc: { proc: ChildProcess, stop: (now?: boolean) => void, finish: Promise<RecordingOptions> };
+  private proc: {
+    proc: ChildProcess,
+    stop: (now?: boolean) => void,
+    finish: Promise<Recop>
+  };
 
   get active() {
     return !!this.proc;
@@ -24,7 +28,7 @@ export class Recorder {
     try {
       await this.proc.finish;
       if (opts.animatedGif) {
-        const result = await FFmpegUtil.generateGIF(opts);
+        const result = await GIFCreator.generate(opts);
 
         if (result) {
           const animated = await result.finish;
@@ -47,7 +51,6 @@ export class Recorder {
       ...Config.getRecordingDefaults(),
       file: await Config.getFilename(),
       ...override,
-      window: await OSUtil.getActiveWindow(),
       ffmpegBinary: binary
     };
 
@@ -55,7 +58,7 @@ export class Recorder {
       throw new Error('Recording already in progress');
     }
 
-    this.proc = await FFmpegUtil.launchProcess(opts);
+    this.proc = await ScreenRecorder.recordActiveWindow(opts);
 
     return { output: this.postProcess(opts) };
   }

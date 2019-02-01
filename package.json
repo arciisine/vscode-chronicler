@@ -101,11 +101,11 @@
     "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "@types/node": "^10.12.18",
     "typescript": "^3.2.2",
-    "vscode": "^1.1.26"
+    "vscode": "^1.1.26",
+    "@types/node": "^10.12.19"
   },
   "dependencies": {
-    "@arcsine/process-win": "^0.1.1"
+    "@arcsine/screen-recorder": "^0.1.1"
   }
 }

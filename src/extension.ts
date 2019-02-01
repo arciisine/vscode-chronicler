@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { OSUtil } from '@arcsine/screen-recorder';
 
 import { Recorder } from './recorder';
 import { RecordingStatus } from './status';
@@ -6,7 +7,6 @@ import { RecordingStatus } from './status';
 import { Util } from './util';
 import { RecordingOptions } from './types';
 import { Config } from './config';
-import { OSUtil } from './os';
 
 export function activate(context: vscode.ExtensionContext) {
 
