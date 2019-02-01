@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Visual Studio Session Recorder",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
@@ -75,7 +75,7 @@
           },
           "chronicler.dest-folder": {
             "description": "Output Folder for Captures",
-            "type": "strinfreuowysnnjaj2cvdwwt2ctovxurjswasj5r3qyrzccmhfsnzdrqg"
+            "type": "~/Recordings"
           },
           "chronicler.recording-defaults": {
             "description": "Recording defaults",

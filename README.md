@@ -54,10 +54,12 @@ This project was inspired by:
 
 # Known Issues
 
-Currently the plugin does not work properly with a multi-screen setup, and is being actively worked on.
+Currently, wayland support is missing
 
 # Release Notes
 
+## 0.0.9
+Externalized the ffmpeg interactions into @arcsine/screen-recorder, fixing default recording folder
 
 ## 0.0.8
 Aligned screen support with @arcsine/active-win, pulling in support for X11 vs linux.  Additionally support for multiple displays.
