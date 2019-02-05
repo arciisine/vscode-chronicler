@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as util from 'util';
 import { RecordingOptions } from './types';
+import { Installer, InstallerHelper, FFMpegInstallPickerOptions } from './installer';
 
 const exists = util.promisify(fs.exists);
 
@@ -47,15 +48,7 @@ export class Config {
     return path.join(dir, base);
   }
 
-  static async getLocation(key: string, options: {
-    title: string,
-    folder?: boolean,
-    defaultName?: string;
-    executable?: boolean;
-    platformDefaults?: { darwin?: string[], win32?: string[], x11?: string[] },
-    validator?: (res: string) => Promise<boolean> | boolean,
-    onAdd?: (file: string) => Promise<any> | any;
-  }) {
+  static async getLocation(key: string, context:vscode.ExtensionContext, options: FFMpegInstallPickerOptions) {
     key = `chronicler.${key}`;
 
     if (!this._config.get(key)) {
@@ -92,20 +85,12 @@ export class Config {
 
       if (valid) {
         file = valid;
-      } else {
-        const res = await vscode.window.showOpenDialog({
-          openLabel: `Select ${options.title}`,
-          canSelectFiles: !options.folder,
-          canSelectFolders: options.folder,
-          canSelectMany: false,
-          defaultUri: valid ? vscode.Uri.file(valid) : undefined
-        });
-
-        if (!res || res.length === 0) {
-          return;
-        }
-
-        file = res[0].fsPath;
+			} else {
+				const installer = new Installer(context, new InstallerHelper(context));
+				file = await installer.getInstallDirectory(options);
+				if (!file) {
+					return;
+				}
       }
 
       if ((await exists(file)) && (!options.validator || (await options.validator(file)))) {
@@ -121,8 +106,8 @@ export class Config {
     return this._config.get(key) as string;
   }
 
-  static async getFFmpegBinary() {
-    return this.getLocation('ffmpeg-binary', {
+  static async getFFmpegBinary(context:vscode.ExtensionContext) {
+    return this.getLocation('ffmpeg-binary', context, {
       title: 'FFMpeg Binary',
       folder: false,
       defaultName: 'ffmpeg',

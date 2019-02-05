@@ -3,8 +3,10 @@ import { Recorder as ScreenRecorder, RecordingOptions as Recop, GIFCreator } fro
 import { Config } from './config';
 import { RecordingOptions } from './types';
 import { ChildProcess } from 'child_process';
+import { ExtensionContext } from 'vscode';
 
 export class Recorder {
+	constructor(private readonly context:ExtensionContext){}
 
   private proc: {
     proc: ChildProcess,
@@ -45,13 +47,14 @@ export class Recorder {
   }
 
   async run(override: Partial<RecordingOptions> = {}) {
-    const binary = (await Config.getFFmpegBinary())!;
+    const binary = (await Config.getFFmpegBinary(this.context))!;
 
-    const opts = {
-      ...Config.getRecordingDefaults(),
-      file: await Config.getFilename(),
-      ...override,
-      ffmpegBinary: binary
+		const opts = {
+			...Config.getRecordingDefaults(),
+			file: await Config.getFilename(),
+			...override,
+			ffmpegBinary: binary,
+      ffmpeg: { binary: binary }
     };
 
     if (this.proc) {
