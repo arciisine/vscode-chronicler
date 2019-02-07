@@ -1,4 +1,4 @@
-import { Recorder as ScreenRecorder, RecordingOptions as Recop, GIFCreator } from '@arcsine/screen-recorder';
+import { Recorder as ScreenRecorder, RecordingOptions as Recop, GIFCreator, GIFOptions } from '@arcsine/screen-recorder';
 
 import { Config } from './config';
 import { RecordingOptions } from './types';
@@ -51,7 +51,9 @@ export class Recorder {
       ...Config.getRecordingDefaults(),
       file: await Config.getFilename(),
       ...override,
-      ffmpegBinary: binary
+      ffmpeg: {
+        binary
+      }
     };
 
     if (this.proc) {
@@ -60,12 +62,21 @@ export class Recorder {
 
     this.proc = await ScreenRecorder.recordActiveWindow(opts);
 
-    return { output: this.postProcess(opts) };
+    return {
+      output: async () => {
+        const newOpts: RecordingOptions = (await this.proc.finish) as any;
+        return this.postProcess(newOpts);
+      }
+    };
+  }
+
+  get running() {
+    return !!this.proc;
   }
 
   stop(force = false) {
-    if (!this.proc) {
-      throw new Error('No recording running');
+    if (!this.running) {
+      throw new Error('info:No recording running');
     }
     try {
       this.proc.stop(force);

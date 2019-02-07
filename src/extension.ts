@@ -16,34 +16,50 @@ export function activate(context: vscode.ExtensionContext) {
   const status = new RecordingStatus();
 
   async function stop() {
-    if (recorder.active) {
+    await new Promise(resolve => setTimeout(resolve, 125)); // Allows for click to be handled properly
+    if (status.counting) {
+      status.stop();
+    } else if (recorder.active) {
       status.stopping();
       recorder.stop();
-    } else {
-      status.setState(false);
+    } else if (recorder.running) {
+      status.stop();
       recorder.stop(true);
     }
   }
 
+  async function initRecording() {
+    if (!(await Config.getFFmpegBinary())) {
+      vscode.window.showWarningMessage('FFmpeg binary location not defined, cannot record unless path is set.');
+      return;
+    }
+
+    if (!(await Config.getDestFolder())) {
+      vscode.window.showWarningMessage('Cannot record video without setting destination folder');
+      return;
+    }
+
+    try {
+      await status.countDown();
+    } catch (err) {
+      vscode.window.showWarningMessage('Recording cancelled');
+      return;
+    }
+
+    return true;
+  }
+
   async function record(opts: Partial<RecordingOptions> = {}) {
     try {
-      if (!(await Config.getFFmpegBinary())) {
-        vscode.window.showWarningMessage('FFmpeg binary location not defined, cannot record unless path is set.');
+      if (!(await initRecording())) {
         return;
       }
 
-      if (!(await Config.getDestFolder())) {
-        vscode.window.showWarningMessage('Cannot record video without setting destination folder');
-        return;
-      }
+      const run = await recorder.run(opts);
+      status.start();
 
-      await status.countDown();
-      const run = await recorder.run(opts)!;
-      status.recording();
-
-      const { file } = (await run.output)!;
-
-      status.setState(false);
+      const { file } = await run.output();
+      status.stop();
 
       const choice = await vscode.window.showInformationMessage(`Session output ${file}`, 'Open', 'Copy', 'Dismiss');
 
@@ -55,10 +71,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     } catch (e) {
       vscode.window.showErrorMessage(e.message);
-    }
-
-    if (!recorder.active) {
-      status.setState(false);
+      if (!recorder.active) {
+        status.stop();
+      }
     }
   }
 

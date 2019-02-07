@@ -13,10 +13,11 @@ export class RecordingStatus {
 
   private item: vscode.StatusBarItem;
   timeout: NodeJS.Timer;
+  counting = false;
 
   constructor() {
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
-    this.setState(false);
+    this.stop();
     this.item.show();
   }
 
@@ -29,19 +30,17 @@ export class RecordingStatus {
     this.item.dispose();
   }
 
-  setState(active: boolean) {
-    if (!active) {
-      this.recordingStopped();
-    }
-
-    this.item.command = !active ? 'chronicler.record' : 'chronicler.stop';
-    this.item.text = !active ? '$(triangle-right) Chronicler' : '$(primitive-square) Chronicler';
-    this.item.color = !active ? 'white' : '#880000';
+  stop() {
+    this.recordingStopped();
+    this.item.command = 'chronicler.record';
+    this.item.text = '$(triangle-right) Chronicler';
+    this.item.color = 'white';
+    this.counting = false;
   }
 
   stopping() {
     this.recordingStopped();
-
+    this.counting = false;
     this.item.text = '$(pulse) Chronicler Stopping...';
     this.item.color = '#ffff00';
   }
@@ -52,8 +51,10 @@ export class RecordingStatus {
     }
   }
 
-  recording() {
-    this.setState(true);
+  start() {
+    this.item.command = 'chronicler.stop';
+    this.item.text = '$(primitive-square) Chronicler';
+    this.item.color = '#ff8888';
 
     const start = Date.now();
     const og = this.item.text;
@@ -83,12 +84,21 @@ export class RecordingStatus {
 
     this.item.command = 'chronicler.stop';
 
+    this.counting = true;
+
+    const colors = ['#ffff00', '#ffff33', '#ffff66', '#ffff99', '#ffffcc'];
+
     for (let i = seconds; i > 0; i--) {
-      this.item.color = ['#ffff00', '#ffff33', '#ffff66', '#ffff99', '#ffffcc'][i];
+      this.item.color = colors[i];
       this.item.text = `$(pulse) Starting in ${i} seconds`;
       await new Promise(r => setTimeout(r, 1000));
+      if (!this.counting) {
+        throw new Error('Countdown canceled');
+      }
     }
+
+    this.counting = false;
     this.item.text = '$(pulse) Chronicler Starting ...';
-    this.item.color = '#ffff00';
+    this.item.color = colors[0];
   }
 }

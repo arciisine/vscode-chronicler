@@ -143,7 +143,7 @@ export class Config {
 
   static async getFFmpegBinary() {
     if (this.hasConfig('ffmpeg-binary')) {
-      return this.getConfig('ffmpeg-binary');
+      return this.getConfig('ffmpeg-binary') as string;
     }
 
     const binName = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
@@ -167,7 +167,7 @@ export class Config {
 
       let downloader: Promise<string>;
 
-      await vscode.window.withProgress({
+      vscode.window.withProgress({
         title: 'Downloading FFMpeg',
         location: vscode.ProgressLocation.Notification
       }, async (progress, token) => {
@@ -177,13 +177,14 @@ export class Config {
             progress.report({ increment: Math.trunc(pct * 100) });
           }
         });
+        await downloader;
       });
 
       const loc = await downloader!;
       await this.setConfig('ffmpeg-binary', loc);
       return loc;
     } else {
-      return this.getLocation('ffmpeg-binary', {
+      return await this.getLocation('ffmpeg-binary', {
         title: 'FFMpeg Binary',
         folder: false,
         defaultName: binName,
