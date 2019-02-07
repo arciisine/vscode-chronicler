@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { OSUtil } from '@arcsine/screen-recorder';
+import { OSUtil } from '@arcsine/screen-recorder/lib/os';
 
 import { Recorder } from './recorder';
 import { RecordingStatus } from './status';
@@ -32,6 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
+      if (!(await Config.getDestFolder())) {
+        vscode.window.showWarningMessage('Cannot record video without setting destination folder');
+        return;
+      }
+
       await status.countDown();
       const run = await recorder.run(opts)!;
       status.recording();
@@ -59,6 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand('chronicler.stop', stop);
   vscode.commands.registerCommand('chronicler.record', () => record());
+  vscode.commands.registerCommand('chronicler.recordGif', () => record({ animatedGif: true }));
   vscode.commands.registerCommand('chronicler.recordWithAudio', () => record({ audio: true }));
   vscode.commands.registerCommand('chronicler.recordWithDuration', async () => {
     const time = await vscode.window.showInputBox({

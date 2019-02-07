@@ -4,12 +4,28 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as util from 'util';
 import { RecordingOptions } from './types';
+import { OSUtil } from '@arcsine/screen-recorder/lib/os';
+import { DownloadUtil } from '@arcsine/screen-recorder';
 
 const exists = util.promisify(fs.exists);
+const home = process.env.HOME || process.env.USERPROFILE;
 
 export class Config {
   private static get _config() {
     return vscode.workspace.getConfiguration();
+  }
+
+  private static hasConfig(key: string) {
+    const conf = this.getConfig(key);
+    return conf !== null && conf !== undefined && conf !== '';
+  }
+
+  private static getConfig(key: string) {
+    return this._config.has(`chronicler.${key}`) ? this._config.get(`chronicler.${key}`) : null;
+  }
+
+  private static async setConfig(key: string, value: any) {
+    return await this._config.update(`chronicler.${key}`, value, vscode.ConfigurationTarget.Global);
   }
 
   static isDebugMode() {
@@ -27,11 +43,20 @@ export class Config {
   }
 
   static async getDestFolder() {
-    if (!this._config.get('chronicler.dest-folder')) {
-      await this._config.update('chronicler.dest-folder', '~/Recordings', vscode.ConfigurationTarget.Global);
+    if (!this.hasConfig('dest-folder')) {
+      await this.getLocation('dest-folder', {
+        title: 'Recording Location',
+        executable: false,
+        folder: true,
+        defaultName: `${home}/Recordings`
+      });
     }
 
-    return (this._config.get('chronicler.dest-folder') as string).replace(/^~/, process.env.HOME || process.env.USERPROFILE || '.');
+    if (!this.hasConfig('dest-folder')) {
+      throw new Error('Cannot proceed with recording, as no destination folder has been selected');
+    }
+
+    return (this.getConfig('dest-folder') as string).replace(/^~/, home || '.');
   }
 
   static async getFilename() {
@@ -47,7 +72,7 @@ export class Config {
     return path.join(dir, base);
   }
 
-  static async getLocation(key: string, options: {
+  static async getLocation(key: string | null, options: {
     title: string,
     folder?: boolean,
     defaultName?: string;
@@ -56,12 +81,11 @@ export class Config {
     validator?: (res: string) => Promise<boolean> | boolean,
     onAdd?: (file: string) => Promise<any> | any;
   }) {
-    key = `chronicler.${key}`;
-
-    if (!this._config.get(key)) {
+    if (!key || !this.hasConfig(key)) {
       const platform = os.platform();
 
-      const folders = options.platformDefaults ? (options.platformDefaults[platform as 'darwin' | 'win32'] || options.platformDefaults.x11 || []) : [];
+      const folders = options.platformDefaults ?
+        (options.platformDefaults[platform as 'darwin' | 'win32'] || options.platformDefaults.x11 || []) : [];
 
       let valid = undefined;
 
@@ -72,20 +96,10 @@ export class Config {
             break;
           }
         }
-      } else if (options.defaultName) {
-        const paths = [...folders];
-        if (options.executable) {
-          paths.unshift(...(process.env.PATH || '')
-            .split(path.delimiter)
-            .map(x => path.resolve(x, options.defaultName!))
-          );
-        }
-        for (const p of paths) {
-          if (await exists(p)) {
-            valid = p;
-            break;
-          }
-        }
+      } else if (options.defaultName && options.executable) {
+        try {
+          valid = await OSUtil.findFileOnPath(options.defaultName!, folders);
+        } catch (e) { /* ignore */ }
       }
 
       let file;
@@ -93,6 +107,7 @@ export class Config {
       if (valid) {
         file = valid;
       } else {
+        await new Promise((resolve) => setTimeout(resolve, 150));
         const res = await vscode.window.showOpenDialog({
           openLabel: `Select ${options.title}`,
           canSelectFiles: !options.folder,
@@ -109,7 +124,9 @@ export class Config {
       }
 
       if ((await exists(file)) && (!options.validator || (await options.validator(file)))) {
-        await this._config.update(key, file, vscode.ConfigurationTarget.Global);
+        if (key) {
+          await this.setConfig(key, file);
+        }
       } else {
         throw new Error(`Invalid location for ${options.title}: ${file}`);
       }
@@ -117,17 +134,62 @@ export class Config {
       if (options.onAdd) {
         await options.onAdd(file);
       }
+
+      return file;
+    } else {
+      return this.getConfig(key) as string;
     }
-    return this._config.get(key) as string;
   }
 
   static async getFFmpegBinary() {
-    return this.getLocation('ffmpeg-binary', {
-      title: 'FFMpeg Binary',
-      folder: false,
-      defaultName: 'ffmpeg',
-      executable: true,
-      validator: file => /ffmpeg/i.test(file)
-    });
+    if (this.hasConfig('ffmpeg-binary')) {
+      return this.getConfig('ffmpeg-binary');
+    }
+
+    const binName = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
+    const res = await vscode.window.showQuickPick(
+      [
+        'Find in filesystem',
+        'Download'
+      ],
+      { placeHolder: `Where to find ${binName}` }
+    );
+
+    if (res === 'Download') {
+      const output = await this.getLocation(null, {
+        title: 'FFMpeg download location',
+        folder: true,
+        executable: false
+      });
+      if (!output) {
+        throw new Error('FFMpeg download location not selected');
+      }
+
+      let downloader: Promise<string>;
+
+      await vscode.window.withProgress({
+        title: 'Downloading FFMpeg',
+        location: vscode.ProgressLocation.Notification
+      }, async (progress, token) => {
+        downloader = DownloadUtil.downloadComponent({
+          destination: output,
+          progress: pct => {
+            progress.report({ increment: Math.trunc(pct * 100) });
+          }
+        });
+      });
+
+      const loc = await downloader!;
+      await this.setConfig('ffmpeg-binary', loc);
+      return loc;
+    } else {
+      return this.getLocation('ffmpeg-binary', {
+        title: 'FFMpeg Binary',
+        folder: false,
+        defaultName: binName,
+        executable: true,
+        validator: file => /ffmpeg/i.test(file)
+      });
+    }
   }
 }

@@ -32,66 +32,68 @@
   "main": "./out/extension",
   "contributes": {
     "commands": [
-      {
-        "title": "Start Recording",
-        "category": "Chronicler",
-        "command": "chronicler.record"
-      },
-      {
-        "title": "Start Recording with Audio",
-        "category": "Chronicler",
-        "command": "chronicler.recordWithAudio"
-      },
-      {
-        "title": "Start Timed-Recording",
-        "category": "Chronicler",
-        "command": "chronicler.recordWithDuration"
-      },
-      {
-        "title": "Stop Recording",
-        "category": "Chronicler",
-        "command": "chronicler.stop"
-      }
-    ],
+    {
+      "title": "Start Recording",
+      "category": "Chronicler",
+      "command": "chronicler.record"
+    },
+    {
+      "title": "Start Recording GIF",
+      "category": "Chronicler",
+      "command": "chronicler.recordGif"
+    },
+    {
+      "title": "Start Recording with Audio",
+      "category": "Chronicler",
+      "command": "chronicler.recordWithAudio"
+    },
+    {
+      "title": "Start Timed-Recording",
+      "category": "Chronicler",
+      "command": "chronicler.recordWithDuration"
+    },
+    {
+      "title": "Stop Recording",
+      "category": "Chronicler",
+      "command": "chronicler.stop"
+    }],
     "keybindings": [
-      {
-        "key": "ctrl+alt+shift+r",
-        "mac": "cmd+alt+shift+r",
-        "command": "chronicler.record"
-      },
-      {
-        "key": "ctrl+alt+shift+s",
-        "mac": "cmd+alt+shift+s",
-        "command": "chronicler.stop"
-      }
-    ],
+    {
+      "key": "ctrl+alt+shift+r",
+      "mac": "cmd+alt+shift+r",
+      "command": "chronicler.record"
+    },
+    {
+      "key": "ctrl+alt+shift+s",
+      "mac": "cmd+alt+shift+s",
+      "command": "chronicler.stop"
+    }],
     "configuration": [
-      {
-        "title": "Chronicler",
-        "properties": {
-          "chronicler.ffmpeg-binary": {
-            "description": "FFmpeg Binary Location",
-            "type": "string"
-          },
-          "chronicler.dest-folder": {
-            "description": "Output Folder for Captures",
-            "type": "~/Recordings"
-          },
-          "chronicler.recording-defaults": {
-            "description": "Recording defaults",
-            "type": "object",
-            "default": {
-              "fps": 10,
-              "countdown": 5
-            }
-          },
-          "chronicler.debug": {
-            "description": "Run with debug logging enabled",
-            "type": "boolean"
+    {
+      "title": "Chronicler",
+      "properties": {
+        "chronicler.ffmpeg-binary": {
+          "description": "FFmpeg Binary Location",
+          "type": "string"
+        },
+        "chronicler.dest-folder": {
+          "description": "Output Folder for Captures",
+          "type": "~/Recordings"
+        },
+        "chronicler.recording-defaults": {
+          "description": "Recording defaults",
+          "type": "object",
+          "default": {
+            "fps": 10,
+            "countdown": 5
           }
+        },
+        "chronicler.debug": {
+          "description": "Run with debug logging enabled",
+          "type": "boolean"
         }
       }
-    ]
+    }]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -106,6 +108,6 @@
     "@types/node": "^10.12.19"
   },
   "dependencies": {
-    "@arcsine/screen-recorder": "^0.1.1"
+    "@arcsine/screen-recorder": "^0.1.5"
   }
 }
