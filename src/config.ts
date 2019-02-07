@@ -44,12 +44,25 @@ export class Config {
 
   static async getDestFolder() {
     if (!this.hasConfig('dest-folder')) {
-      await this.getLocation('dest-folder', {
-        title: 'Recording Location',
-        executable: false,
-        folder: true,
-        defaultName: `${home}/Recordings`
-      });
+
+      const res = await vscode.window.showInformationMessage(
+        'The recording output folder has not been set. Would you like to select a folder, or default to ~/Recordings ?',
+        'Select Output Folder',
+        'Default to ~/Recordings'
+      );
+
+      if (res) {
+        if (res.startsWith('Select')) {
+          await this.getLocation('dest-folder', {
+            title: 'Recording Location',
+            executable: false,
+            folder: true,
+            defaultName: `${home}/Recordings`
+          });
+        } else {
+          await this.setConfig('dest-folder', '~/Recordings');
+        }
+      }
     }
 
     if (!this.hasConfig('dest-folder')) {
@@ -147,17 +160,15 @@ export class Config {
     }
 
     const binName = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
-    const res = await vscode.window.showQuickPick(
-      [
-        'Find in filesystem',
-        'Download'
-      ],
-      { placeHolder: `Where to find ${binName}` }
+    const res = await vscode.window.showInformationMessage(
+      'FFMpeg is not set, would you like to find it in the filesystem or download the latest version?',
+      'Find in filesystem',
+      'Download'
     );
 
     if (res === 'Download') {
       const output = await this.getLocation(null, {
-        title: 'FFMpeg download location',
+        title: 'Download location',
         folder: true,
         executable: false
       });
@@ -183,7 +194,7 @@ export class Config {
       const loc = await downloader!;
       await this.setConfig('ffmpeg-binary', loc);
       return loc;
-    } else {
+    } else if (res === 'Find in filesystem') {
       return await this.getLocation('ffmpeg-binary', {
         title: 'FFMpeg Binary',
         folder: false,
