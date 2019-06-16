@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Visual Studio Session Recorder",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
@@ -32,31 +32,31 @@
   "main": "./out/extension",
   "contributes": {
     "commands": [
-      {
-        "title": "Start Recording",
-        "category": "Chronicler",
-        "command": "chronicler.record"
-      },
-      {
-        "title": "Start Recording GIF",
-        "category": "Chronicler",
-        "command": "chronicler.recordGif"
-      },
-      {
-        "title": "Start Recording with Audio",
-        "category": "Chronicler",
-        "command": "chronicler.recordWithAudio"
-      },
-      {
-        "title": "Start Timed-Recording",
-        "category": "Chronicler",
-        "command": "chronicler.recordWithDuration"
-      },
-      {
-        "title": "Stop Recording",
-        "category": "Chronicler",
-        "command": "chronicler.stop"
-      }],
+    {
+      "title": "Start Recording",
+      "category": "Chronicler",
+      "command": "chronicler.record"
+    },
+    {
+      "title": "Start Recording GIF",
+      "category": "Chronicler",
+      "command": "chronicler.recordGif"
+    },
+    {
+      "title": "Start Recording with Audio",
+      "category": "Chronicler",
+      "command": "chronicler.recordWithAudio"
+    },
+    {
+      "title": "Start Timed-Recording",
+      "category": "Chronicler",
+      "command": "chronicler.recordWithDuration"
+    },
+    {
+      "title": "Stop Recording",
+      "category": "Chronicler",
+      "command": "chronicler.stop"
+    }],
     "keybindings": [
     {
       "key": "ctrl+alt+shift+r",
