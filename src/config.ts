@@ -204,4 +204,8 @@ export class Config {
       });
     }
   }
+
+  static getAutoRecordLiveShare() {
+    return this.getConfig('auto-record-live-share');
+  }
 }

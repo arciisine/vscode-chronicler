@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as vsls from 'vsls';
 import { OSUtil } from '@arcsine/screen-recorder/lib/os';
 
 import { Recorder } from './recorder';
@@ -8,12 +9,23 @@ import { Util } from './util';
 import { RecordingOptions } from './types';
 import { Config } from './config';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
   Util.context = context;
 
   const recorder = new Recorder();
   const status = new RecordingStatus();
+
+  const vslsApi = await vsls.getApi();
+  if (vslsApi && Config.getAutoRecordLiveShare()) {
+    vslsApi.onDidChangeSession((e) => {
+      if (e.session.role === vsls.Role.None) {
+        stop();
+      } else {
+        record();
+      }
+    });
+  }
 
   async function stop() {
     await new Promise(resolve => setTimeout(resolve, 125)); // Allows for click to be handled properly
