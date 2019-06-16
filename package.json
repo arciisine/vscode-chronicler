@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Visual Studio Session Recorder",
-  "version": "0.0.9",
+  "version": "0.1.1",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
@@ -58,47 +58,47 @@
         "command": "chronicler.stop"
       }],
     "keybindings": [
-      {
-        "key": "ctrl+alt+shift+r",
-        "mac": "cmd+alt+shift+r",
-        "command": "chronicler.record"
-      },
-      {
-        "key": "ctrl+alt+shift+s",
-        "mac": "cmd+alt+shift+s",
-        "command": "chronicler.stop"
-      }],
+    {
+      "key": "ctrl+alt+shift+r",
+      "mac": "cmd+alt+shift+r",
+      "command": "chronicler.record"
+    },
+    {
+      "key": "ctrl+alt+shift+s",
+      "mac": "cmd+alt+shift+s",
+      "command": "chronicler.stop"
+    }],
     "configuration": [
-      {
-        "title": "Chronicler",
-        "properties": {
-          "chronicler.ffmpeg-binary": {
-            "description": "FFmpeg Binary Location",
-            "type": "string"
-          },
-          "chronicler.dest-folder": {
-            "description": "Output Folder for Captures",
-            "type": "~/Recordings"
-          },
-          "chronicler.recording-defaults": {
-            "description": "Recording defaults",
-            "type": "object",
-            "default": {
-              "fps": 10,
-              "countdown": 5
-            }
-          },
-          "chronicler.debug": {
-            "description": "Run with debug logging enabled",
-            "type": "boolean"
-          },
-          "chronicler.auto-record-live-share": {
-            "description": "Specifies whether recording should automatically start and stop when in a Live Share session",
-            "type": "boolean",
-            "default": false
+    {
+      "title": "Chronicler",
+      "properties": {
+        "chronicler.ffmpeg-binary": {
+          "description": "FFmpeg Binary Location",
+          "type": "string"
+        },
+        "chronicler.dest-folder": {
+          "description": "Output Folder for Captures",
+          "type": "~/Recordings"
+        },
+        "chronicler.recording-defaults": {
+          "description": "Recording defaults",
+          "type": "object",
+          "default": {
+            "fps": 10,
+            "countdown": 5
           }
+        },
+        "chronicler.debug": {
+          "description": "Run with debug logging enabled",
+          "type": "boolean"
+        },
+        "chronicler.auto-record-live-share": {
+          "description": "Specifies whether recording should automatically start and stop when in a Live Share session",
+          "type": "boolean",
+          "default": false
         }
-      }]
+      }
+    }]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
