@@ -8,7 +8,7 @@ import { Util } from './util';
 import { RecordingOptions } from './types';
 import { Config } from './config';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
   Util.context = context;
 
@@ -77,6 +77,23 @@ export function activate(context: vscode.ExtensionContext) {
     }
   }
 
+  async function initializeLiveShare() {
+    if (Config.getAutoRecordLiveShare()) {
+      const vsls = await import('vsls');
+      const liveShare = await vsls.getApi();
+  
+      if (liveShare) {
+        liveShare.onDidChangeSession((e) => {
+          if (e.session.role === vsls.Role.None) {
+            stop();
+          } else {
+            record();
+          }
+        });
+      }
+    }
+  }
+
   vscode.commands.registerCommand('chronicler.stop', stop);
   vscode.commands.registerCommand('chronicler.record', () => record());
   vscode.commands.registerCommand('chronicler.recordGif', () => record({ animatedGif: true }));
@@ -92,4 +109,6 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   context.subscriptions.push(recorder, status);
+
+  initializeLiveShare();
 }

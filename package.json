@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Visual Studio Session Recorder",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
@@ -91,6 +91,11 @@
         "chronicler.debug": {
           "description": "Run with debug logging enabled",
           "type": "boolean"
+        },
+        "chronicler.auto-record-live-share": {
+          "description": "Specifies whether recording should automatically start and stop when in a Live Share session",
+          "type": "boolean",
+          "default": false
         }
       }
     }]
@@ -108,6 +113,7 @@
     "@types/node": "^10.12.19"
   },
   "dependencies": {
-    "@arcsine/screen-recorder": "^0.1.5"
+    "@arcsine/screen-recorder": "^0.1.5",
+    "vsls": "^0.3.1291"
   }
 }
