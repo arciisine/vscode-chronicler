@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as vsls from 'vsls';
 import { OSUtil } from '@arcsine/screen-recorder/lib/os';
 
 import { Recorder } from './recorder';
@@ -15,17 +14,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const recorder = new Recorder();
   const status = new RecordingStatus();
-
-  const vslsApi = await vsls.getApi();
-  if (vslsApi && Config.getAutoRecordLiveShare()) {
-    vslsApi.onDidChangeSession((e) => {
-      if (e.session.role === vsls.Role.None) {
-        stop();
-      } else {
-        record();
-      }
-    });
-  }
 
   async function stop() {
     await new Promise(resolve => setTimeout(resolve, 125)); // Allows for click to be handled properly
@@ -89,6 +77,23 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
+  async function initializeLiveShare() {
+    if (Config.getAutoRecordLiveShare()) {
+      const vsls = require('vsls');
+      const liveShare = vsls.getApi();
+  
+      if (liveShare) {
+        liveShare.onDidChangeSession((e) => {
+          if (e.session.role === vsls.Role.None) {
+            stop();
+          } else {
+            record();
+          }
+        });
+      }
+    }
+  }
+
   vscode.commands.registerCommand('chronicler.stop', stop);
   vscode.commands.registerCommand('chronicler.record', () => record());
   vscode.commands.registerCommand('chronicler.recordGif', () => record({ animatedGif: true }));
@@ -104,4 +109,6 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   context.subscriptions.push(recorder, status);
+
+  initializeLiveShare();
 }
