@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { OSUtil } from '@arcsine/screen-recorder/lib/os';
-import { LiveShare } from 'vsls';
 
 import { Recorder } from './recorder';
 import { RecordingStatus } from './status';
@@ -80,8 +79,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
   async function initializeLiveShare() {
     if (Config.getAutoRecordLiveShare()) {
-      const vsls = require('vsls');
-      const liveShare: LiveShare = await vsls.getApi();
+      const vsls = await import('vsls');
+      const liveShare = await vsls.getApi();
   
       if (liveShare) {
         liveShare.onDidChangeSession((e) => {
