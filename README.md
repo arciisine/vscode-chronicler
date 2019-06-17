@@ -34,8 +34,10 @@ The available configuration options are:
   * `countdown:number?` - The number of seconds to wait before recordings starts, defaults to `5`.
   * `duration?: number` - How long to record for, defaults to `0` which is indefinite
   * `animatedGif?: boolean` - Flag to determine if we should produce animated GIFs or not.
+  * `gifScale?: number` - What ratio each dimension of the GIF should be scaled by, defaults to `1`. 
   * `fps: number` - Number of frames per second, defaults to `12`
   * `flags?: object` - Configuration flags to pass to the FFmpeg process 
+* `chronicler.auto-record-live-share` - Determines the state for auto recording live share sessions, defaults to `false`.  
 * `chronicler.debug` - Run the plugin in debug mode, provides more information when running FFmpeg
 
 ## Animated GIFs
@@ -57,6 +59,10 @@ This project was inspired by:
 Currently, wayland support is missing
 
 # Release Notes
+
+## 0.1.0
+Added in support for auto recording VS Live Share session
+Added in flag to support scaling of generated GIFs
 
 ## 0.0.9
 Externalized the ffmpeg interactions into @arcsine/screen-recorder, fixing default recording folder
