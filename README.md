@@ -62,11 +62,12 @@ This project was inspired by:
 Currently, wayland support is missing
 
 # Release Notes
-Added in support for auto recording VS Live Share session
-Added in flag to support scaling of generated GIFs
+
+## 0.1.2
+Added in support for auto recording VS Live Share session. Added in flag to support scaling of generated GIFs.  Special thanks to @lostintangent for the live share integration.
 
 ## 0.1.0
-Exposed download functionality from @arciisine/screen-recorder, and provide ability for user to set required configuration in a guide manner.  Special thanks fo @DonJayamanne for the feedback.
+Exposed download functionality from @arciisine/screen-recorder, and provide ability for user to set required configuration in a guide manner.  Special thanks to @DonJayamanne for the feedback.
 
 ## 0.0.9
 Externalized the ffmpeg interactions into @arcsine/screen-recorder, fixing default recording folder
