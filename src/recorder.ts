@@ -28,7 +28,10 @@ export class Recorder {
     try {
       await this.proc.finish;
       if (opts.animatedGif) {
-        const result = await GIFCreator.generate(opts);
+        const result = await GIFCreator.generate({
+          ...opts,
+          scale: opts.gifScale || 1
+        });
 
         if (result) {
           const animated = await result.finish;
