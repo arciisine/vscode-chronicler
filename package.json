@@ -80,7 +80,8 @@
           },
           "chronicler.dest-folder": {
             "description": "Output Folder for Captures",
-            "type": "~/Recordings"
+            "type": "string",
+            "default": "~/Recordings"
           },
           "chronicler.recording-defaults": {
             "description": "Recording defaults",
