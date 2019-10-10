@@ -14,10 +14,13 @@ The recording process determines the location and dimensions of your VS Code win
 The underlying tools for screen recording, rely upon FFmpeg.  This has a distinct limitation of only being able to record a portion of the screen.  This means that the recording does not follow windows as they move, but specifically the initial location/size of the vscode window.
 
 ## How to Start Recording
-This will initiate a new recording, and will prompt for the FFmpeg installation directory if not set yet.  This can be triggered by:
+This will initiate a new recording, and will prompt for the FFmpeg installation if not set yet. This prompt will allow you to specify the location or to download the latest version as needed.
+
+This can be triggered by:
 * Click on the icon in the status bar to launch the recorder
 * Accessing the command, via the command palette:
    - `Chronicler Start Recording` - Standard recording
+   - `Chronicler Start Recording GIF` - Standard recording, that also produces an animated GIF of the output.
    - `Chronicler Start Timed-Recording` - Recording with a set duration, user will be prompted, with a default of `120` seconds.
    - `Chronicler Start Recording with Audio` - Standard recording with audio support (OSX requires a [custom build of FFmpeg](https://github.com/arciisine/vscode-chronicler/binaries/osx/ffmpeg) to bypass choppy audio.  More information on the custom build can be found [here](https://trac.ffmpeg.org/ticket/4513))
 
@@ -66,9 +69,14 @@ Currently, wayland support is missing
 
 # Release Notes
 
+## 0.1.3
+Adding in new osx binary, statically compiled, and upgrading screen-recorder to 0.1.6. Additionally merged changes in for the output directory to be a properly configurable element.  
+
+## 0.1.2
+Added in support for auto recording VS Live Share session. Added in flag to support scaling of generated GIFs.  Special thanks to @lostintangent for the live share integration.
+
 ## 0.1.0
-Added in support for auto recording VS Live Share session
-Added in flag to support scaling of generated GIFs
+Exposed download functionality from @arciisine/screen-recorder, and provide ability for user to set required configuration in a guide manner.  Special thanks to @DonJayamanne for the feedback.
 
 ## 0.0.9
 Externalized the ffmpeg interactions into @arcsine/screen-recorder, fixing default recording folder
