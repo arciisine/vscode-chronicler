@@ -6,6 +6,7 @@ import * as util from 'util';
 import { RecordingOptions } from './types';
 import { OSUtil } from '@arcsine/screen-recorder/lib/os';
 import { DownloadUtil } from '@arcsine/screen-recorder';
+import { Util } from './util';
 
 const exists = util.promisify(fs.exists);
 const home = process.env.HOME || process.env.USERPROFILE;
@@ -38,6 +39,7 @@ export class Config {
       fps: 10,
       animatedGif: false,
       countdown: 5,
+      flags: {},
       ...(this._config.get('chronicler.recording-defaults') || {})
     } as RecordingOptions;
   }
@@ -69,7 +71,9 @@ export class Config {
       throw new Error('Cannot proceed with recording, as no destination folder has been selected');
     }
 
-    return (this.getConfig('dest-folder') as string).replace(/^~/, home || '.');
+    return (this.getConfig('dest-folder') as string)
+      .replace(/^~/, home || '.')
+      .replace('${workspaceFolder}', Util.getWorkspacePath() || '.');
   }
 
   static async getFilename() {

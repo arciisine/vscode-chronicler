@@ -49,15 +49,19 @@ export class Recorder {
 
   async run(override: Partial<RecordingOptions> = {}) {
     const binary = (await Config.getFFmpegBinary())!;
+    const defs = Config.getRecordingDefaults();
 
     const opts = {
-      ...Config.getRecordingDefaults(),
+      ...defs,
       file: await Config.getFilename(),
       ...override,
       ffmpeg: {
-        binary
+        binary,
+        flags: defs.flags
       }
     };
+
+
 
     if (this.proc) {
       throw new Error('Recording already in progress');

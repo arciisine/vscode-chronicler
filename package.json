@@ -86,6 +86,7 @@
             "description": "Recording defaults",
             "type": "object",
             "default": {
+              "flags": null,
               "fps": 10,
               "countdown": 5
             }

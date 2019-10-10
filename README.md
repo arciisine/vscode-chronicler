@@ -10,6 +10,9 @@ Chronicler is a cross-platform visual studio code plugin for recording sessions 
 ## How Recording Works
 The recording process determines the location and dimensions of your VS Code window, and will start a recording session for that region, immediately.  To prevent the UI from getting in the way, when stopping, use the keyboard shortcuts to terminate the process. The status bar will be your indicator of the current status of your recording.  On completion you can can choose to open the file with your operating system, you can copy the path to your clipboard, or just dismiss.  Additionally, if you are configured your settings for supporting the animated gif production, the file path  will change to point to the `.gif` file instead of the `.mp4` file.
 
+### Caveats
+The underlying tools for screen recording, rely upon FFmpeg.  This has a distinct limitation of only being able to record a portion of the screen.  This means that the recording does not follow windows as they move, but specifically the initial location/size of the vscode window.
+
 ## How to Start Recording
 This will initiate a new recording, and will prompt for the FFmpeg installation directory if not set yet.  This can be triggered by:
 * Click on the icon in the status bar to launch the recorder
@@ -31,12 +34,15 @@ The available configuration options are:
 * `chronicler.ffmpeg-binary` - (optional) This is the path to the FFMpeg binary, this will be used to convert the recordings into animated .gif files, if specified
 * `chronicler.dest-folder` - This is the output folder for all recordings, defaults to `$HOME/Recordings`
 * `chronicler.recording-defaults` - These are the default parameters for recording, this supports the following:
-  * `countdown:number?` - The number of seconds to wait before recordings starts, defaults to `5`.
-  * `duration?: number` - How long to record for, defaults to `0` which is indefinite
-  * `animatedGif?: boolean` - Flag to determine if we should produce animated GIFs or not.
-  * `gifScale?: number` - What ratio each dimension of the GIF should be scaled by, defaults to `1`. 
+  * `countdown? :number` - The number of seconds to wait before recordings starts, defaults to `5`.
+  * `duration? :number` - How long to record for, defaults to `0` which is indefinite
+  * `animatedGif? :boolean` - Flag to determine if we should produce animated GIFs or not.
+  * `gifScale? :number` - What ratio each dimension of the GIF should be scaled by, defaults to `1`. 
   * `fps: number` - Number of frames per second, defaults to `12`
-  * `flags?: object` - Configuration flags to pass to the FFmpeg process 
+  * `flags? :object` - Configuration flags to pass to the FFmpeg process 
+    * `pix_fmt ?:string` - The format flag to pass to ffmpeg, defaults to `yuvj444p`.  Set to `yuv420p` if you want to support QuickTime on osx.
+    * `c:v ?:string` - The video codec to use for encoding, defaults to `libx264`
+    * `preset ?:string` - The ffmpeg recording preset, defaults to `ultrafast`
 * `chronicler.auto-record-live-share` - Determines the state for auto recording live share sessions, defaults to `false`.  
 * `chronicler.debug` - Run the plugin in debug mode, provides more information when running FFmpeg
 
