@@ -69,6 +69,10 @@ Currently, wayland support is missing
 
 # Release Notes
 
+## 0.1.4
+Adding in support for `${workspaceFolder}` as a valid substitution for the recording destination.  Additionally, clarified and documented 
+how to set ffmpeg flags for `pix_fmt` and `c:v` codecs.  Also documented the behavior of recording, with respect to window moving.
+
 ## 0.1.3
 Adding in new osx binary, statically compiled, and upgrading screen-recorder to 0.1.6. Additionally merged changes in for the output directory to be a properly configurable element.  
 
