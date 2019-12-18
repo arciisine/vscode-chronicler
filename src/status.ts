@@ -34,7 +34,7 @@ export class RecordingStatus {
     this.recordingStopped();
     this.item.command = 'chronicler.record';
     this.item.text = '$(triangle-right) Chronicler';
-    this.item.color = 'white';
+    this.item.color = new vscode.ThemeColor('statusBar.foreground');
     this.counting = false;
   }
 
