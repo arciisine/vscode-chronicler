@@ -14,11 +14,20 @@ export class RecordingStatus {
   private item: vscode.StatusBarItem;
   timeout: NodeJS.Timer;
   counting = false;
+  mainColor
 
   constructor() {
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
     this.stop();
     this.item.show();
+    
+    this.mainColor = getThemeColor('statusBar.foreground')
+    vscode.debug.onDidStartDebugSession((e) => mainColor = getThemeColor('statusBar.debuggingForeground'))
+    vscode.debug.onDidTerminateDebugSession((e) => mainColor = getThemeColor('statusBar.foreground'))
+  }
+  
+  getThemeColor(key) {
+    return new vscode.ThemeColor(key)
   }
 
   show() {
@@ -34,7 +43,7 @@ export class RecordingStatus {
     this.recordingStopped();
     this.item.command = 'chronicler.record';
     this.item.text = '$(triangle-right) Chronicler';
-    this.item.color = 'white';
+    this.item.color = this.mainColor;
     this.counting = false;
   }
 
