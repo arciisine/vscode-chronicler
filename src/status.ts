@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { window, debug, ThemeColor, StatusBarItem, StatusBarAlignment } from 'vscode';
 import { Config } from './config';
 
 function clean(x: number) {
@@ -11,14 +11,19 @@ function clean(x: number) {
 
 export class RecordingStatus {
 
-  private item: vscode.StatusBarItem;
+  private item: StatusBarItem;
   timeout: NodeJS.Timer;
   counting = false;
+  mainColor: ThemeColor;
 
   constructor() {
-    this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
+    this.item = window.createStatusBarItem(StatusBarAlignment.Right);
     this.stop();
     this.item.show();
+
+    this.mainColor = new ThemeColor('statusBar.foreground');
+    debug.onDidStartDebugSession(() => this.mainColor = new ThemeColor('statusBar.debuggingForeground'));
+    debug.onDidTerminateDebugSession(() => this.mainColor = new ThemeColor('statusBar.foreground'));
   }
 
   show() {
@@ -34,7 +39,7 @@ export class RecordingStatus {
     this.recordingStopped();
     this.item.command = 'chronicler.record';
     this.item.text = '$(triangle-right) Chronicler';
-    this.item.color = 'white';
+    this.item.color = this.mainColor;
     this.counting = false;
   }
 
