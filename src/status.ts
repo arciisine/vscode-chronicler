@@ -9,21 +9,38 @@ function clean(x: number) {
   return res;
 }
 
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+const SECOND_MS = 1000;
+const MINUTE_MS = SECOND_MS * 60;
+const HOUR_MS = MINUTE_MS * 60;
+
 export class RecordingStatus {
 
   private item: StatusBarItem;
   timeout: NodeJS.Timer;
   counting = false;
-  mainColor: ThemeColor;
 
   constructor() {
     this.item = window.createStatusBarItem(StatusBarAlignment.Right);
     this.stop();
     this.item.show();
+  }
 
-    this.mainColor = new ThemeColor('statusBar.foreground');
-    debug.onDidStartDebugSession(() => this.mainColor = new ThemeColor('statusBar.debuggingForeground'));
-    debug.onDidTerminateDebugSession(() => this.mainColor = new ThemeColor('statusBar.foreground'));
+  get mainColor() {
+    return new ThemeColor(
+      debug.activeDebugSession ?
+        'statusBar.debuggingForeground' :
+        'statusBar.foreground');
+  }
+
+  get contrastingColors() {
+    // TODO: compute list based on theme dark/light
+    return ['#ffff00', '#ffff33', '#ffff66', '#ffff99', '#ffffcc'];
+  }
+
+  get contrastingColorMain() {
+    return this.contrastingColors[0];
   }
 
   show() {
@@ -40,14 +57,16 @@ export class RecordingStatus {
     this.item.command = 'chronicler.record';
     this.item.text = '$(triangle-right) Chronicler';
     this.item.color = this.mainColor;
+
     this.counting = false;
   }
 
   stopping() {
     this.recordingStopped();
-    this.counting = false;
     this.item.text = '$(pulse) Chronicler Stopping...';
-    this.item.color = '#ffff00';
+    this.item.color = this.contrastingColorMain;
+
+    this.counting = false;
   }
 
   recordingStopped() {
@@ -56,25 +75,21 @@ export class RecordingStatus {
     }
   }
 
+  updateTime(originalText: string, start: number) {
+    const time = Date.now() - start;
+    let timeStr = `${clean((time / MINUTE_MS) % 60)}:${clean((time / SECOND_MS) % 60)}`;
+    if (time > HOUR_MS) {
+      timeStr = `${Math.trunc(time / HOUR_MS)}:${timeStr}`;
+    }
+    this.item.text = `${originalText}: ${timeStr}`;
+  }
+
   start() {
     this.item.command = 'chronicler.stop';
     this.item.text = '$(primitive-square) Chronicler';
-    this.item.color = '#ff8888';
+    this.item.color = this.contrastingColorMain;
 
-    const start = Date.now();
-    const og = this.item.text;
-    const sec = 1000;
-    const min = sec * 60;
-    const hour = min * 60;
-
-    const update = () => {
-      const time = Date.now() - start;
-      let timeStr = `${clean((time / min) % 60)}:${clean((time / sec) % 60)}`;
-      if (time > hour) {
-        timeStr = `${Math.trunc(time / hour)}:${timeStr}`;
-      }
-      this.item.text = `${og}: ${timeStr}`;
-    };
+    const update = this.updateTime.bind(this, this.item.text, Date.now());
 
     this.timeout = setInterval(update, 1000);
 
@@ -91,12 +106,14 @@ export class RecordingStatus {
 
     this.counting = true;
 
-    const colors = ['#ffff00', '#ffff33', '#ffff66', '#ffff99', '#ffffcc'];
+    const cols = this.contrastingColors;
 
     for (let i = seconds; i > 0; i--) {
-      this.item.color = colors[i];
       this.item.text = `$(pulse) Starting in ${i} seconds`;
-      await new Promise(r => setTimeout(r, 1000));
+      this.item.color = cols[Math.trunc((i - 1) / seconds * cols.length)];
+
+      await sleep(1000);
+
       if (!this.counting) {
         throw new Error('Countdown canceled');
       }
@@ -104,6 +121,6 @@ export class RecordingStatus {
 
     this.counting = false;
     this.item.text = '$(pulse) Chronicler Starting ...';
-    this.item.color = colors[0];
+    this.item.color = this.contrastingColorMain;
   }
 }
