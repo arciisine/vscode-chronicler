@@ -69,6 +69,9 @@ Currently, wayland support is missing
 
 # Release Notes
 
+## 0.1.5
+Removed color styling from status bar, to better support themes.  Added ability to open a recording's containing folder, or delete it on termination of recording.
+
 ## 0.1.4
 Adding in support for `${workspaceFolder}` as a valid substitution for the recording destination.  Additionally, clarified and documented 
 how to set ffmpeg flags for `pix_fmt` and `c:v` codecs.  Also documented the behavior of recording, with respect to window moving.

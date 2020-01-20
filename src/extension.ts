@@ -1,4 +1,7 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
+import { promises as fs } from 'fs';
+
 import { OSUtil } from '@arcsine/screen-recorder/lib/os';
 
 import { Recorder } from './recorder';
@@ -61,14 +64,13 @@ export async function activate(context: vscode.ExtensionContext) {
       const { file } = await run.output();
       status.stop();
 
-      const choice = await vscode.window.showInformationMessage(`Session output ${file}`, 'Open', 'Copy', 'Dismiss');
-
-      if (choice === 'Open') {
-        await OSUtil.openFile(file);
-      } else if (choice === 'Copy') {
-        vscode.env.clipboard.writeText(file);
+      const choice = await vscode.window.showInformationMessage(`Session output ${file}`, 'View', 'Copy', 'Delete', 'Folder');
+      switch (choice) {
+        case 'View': await OSUtil.openFile(file); break;
+        case 'Folder': await OSUtil.openFile(path.dirname(file)); break;
+        case 'Copy': vscode.env.clipboard.writeText(file);
+        case 'Delete': await fs.unlink(file); break;
       }
-
     } catch (e) {
       vscode.window.showErrorMessage(e.message);
       if (!recorder.active) {
@@ -81,7 +83,7 @@ export async function activate(context: vscode.ExtensionContext) {
     if (Config.getAutoRecordLiveShare()) {
       const vsls = await import('vsls');
       const liveShare = await vsls.getApi();
-  
+
       if (liveShare) {
         liveShare.onDidChangeSession((e) => {
           if (e.session.role === vsls.Role.None) {

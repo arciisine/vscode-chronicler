@@ -1,4 +1,4 @@
-import { window, debug, ThemeColor, StatusBarItem, StatusBarAlignment } from 'vscode';
+import { window, StatusBarItem, StatusBarAlignment } from 'vscode';
 import { Config } from './config';
 
 function clean(x: number) {
@@ -27,22 +27,6 @@ export class RecordingStatus {
     this.item.show();
   }
 
-  get mainColor() {
-    return new ThemeColor(
-      debug.activeDebugSession ?
-        'statusBar.debuggingForeground' :
-        'statusBar.foreground');
-  }
-
-  get contrastingColors() {
-    // TODO: compute list based on theme dark/light
-    return ['#ffff00', '#ffff33', '#ffff66', '#ffff99', '#ffffcc'];
-  }
-
-  get contrastingColorMain() {
-    return this.contrastingColors[0];
-  }
-
   show() {
     this.item.show();
   }
@@ -56,16 +40,12 @@ export class RecordingStatus {
     this.recordingStopped();
     this.item.command = 'chronicler.record';
     this.item.text = '$(triangle-right) Chronicler';
-    this.item.color = this.mainColor;
-
     this.counting = false;
   }
 
   stopping() {
     this.recordingStopped();
-    this.item.text = '$(pulse) Chronicler Stopping...';
-    this.item.color = this.contrastingColorMain;
-
+    this.item.text = 'Chronicler stopping...';
     this.counting = false;
   }
 
@@ -87,7 +67,6 @@ export class RecordingStatus {
   start() {
     this.item.command = 'chronicler.stop';
     this.item.text = '$(primitive-square) Chronicler';
-    this.item.color = this.contrastingColorMain;
 
     const update = this.updateTime.bind(this, this.item.text, Date.now());
 
@@ -106,11 +85,8 @@ export class RecordingStatus {
 
     this.counting = true;
 
-    const cols = this.contrastingColors;
-
-    for (let i = seconds; i > 0; i--) {
-      this.item.text = `$(pulse) Starting in ${i} seconds`;
-      this.item.color = cols[Math.trunc((i - 1) / seconds * cols.length)];
+    for (let i = seconds; i > 0; i -= 1) {
+      this.item.text = `Starting in ${i} seconds...`;
 
       await sleep(1000);
 
@@ -120,7 +96,6 @@ export class RecordingStatus {
     }
 
     this.counting = false;
-    this.item.text = '$(pulse) Chronicler Starting ...';
-    this.item.color = this.contrastingColorMain;
+    this.item.text = 'Chronicler starting';
   }
 }
