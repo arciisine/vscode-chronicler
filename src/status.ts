@@ -39,7 +39,7 @@ export class RecordingStatus {
   stop() {
     this.recordingStopped();
     this.item.command = 'chronicler.record';
-    this.item.text = '$(triangle-right) Chronicler';
+    this.item.text = '$(debug-start) Chronicler';
     this.counting = false;
   }
 
@@ -66,7 +66,7 @@ export class RecordingStatus {
 
   start() {
     this.item.command = 'chronicler.stop';
-    this.item.text = '$(primitive-square) Chronicler';
+    this.item.text = '$(debug-stop) Chronicler';
 
     const update = this.updateTime.bind(this, this.item.text, Date.now());
 
@@ -86,7 +86,7 @@ export class RecordingStatus {
     this.counting = true;
 
     for (let i = seconds; i > 0; i -= 1) {
-      this.item.text = `Starting in ${i} seconds...`;
+      this.item.text = `$(debug-breakpoint-log-unverified) Starting in ${i} seconds...`;
 
       await sleep(1000);
 

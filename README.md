@@ -1,9 +1,9 @@
 <h1>
   <sub><img src="https://github.com/arciisine/vscode-chronicler/raw/master/images/logo.png" height="40"></sub>
-  VSCode Chronicler
+  VS Code Chronicler
 </h1>
 
-Chronicler is a cross-platform visual studio code plugin for recording sessions within vscode. The application relies upon [FFmpeg](https://www.ffmpeg.org/) as the base for recording. The primary functionality of the plugin is to start and stop recording. The status bar contains an item that will provide you the current state of the recording process, and is an actionable element for starting/stopping a recording.
+Chronicler is a cross-platform plugin for recording screens (windows) within VS Code. The application relies upon [FFmpeg](https://www.ffmpeg.org/) as the base for recording. The primary functionality of the plugin is to start and stop recording. The status bar contains an item that will provide you the current state of the recording process, and is an actionable element for starting/stopping a recording.
 
 ![Screen Capture in Action](./images/screencast-small.gif)
 
@@ -11,7 +11,7 @@ Chronicler is a cross-platform visual studio code plugin for recording sessions 
 The recording process determines the location and dimensions of your VS Code window, and will start a recording session for that region, immediately.  To prevent the UI from getting in the way, when stopping, use the keyboard shortcuts to terminate the process. The status bar will be your indicator of the current status of your recording.  On completion you can can choose to open the file with your operating system, you can copy the path to your clipboard, or just dismiss.  Additionally, if you are configured your settings for supporting the animated gif production, the file path  will change to point to the `.gif` file instead of the `.mp4` file.
 
 ### Caveats
-The underlying tools for screen recording, rely upon FFmpeg.  This has a distinct limitation of only being able to record a portion of the screen.  This means that the recording does not follow windows as they move, but specifically the initial location/size of the vscode window.
+The underlying tools for screen recording, rely upon FFmpeg.  This has a distinct limitation of only being able to record a portion of the screen.  This means that the recording does not follow windows as they move, but specifically the initial location/size of the VS Code window.
 
 ## How to Start Recording
 This will initiate a new recording, and will prompt for the FFmpeg installation if not set yet. This prompt will allow you to specify the location or to download the latest version as needed.
@@ -68,6 +68,9 @@ This project was inspired by:
 Currently, wayland support is missing
 
 # Release Notes
+
+## 0.1.6
+Updating recording icons to use debug set, which provides color.  Updating documentation.
 
 ## 0.1.5
 Removed color styling from status bar, to better support themes.  Added ability to open a recording's containing folder, or delete it on termination of recording.
