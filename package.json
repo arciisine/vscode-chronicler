@@ -1,8 +1,8 @@
 {
   "name": "chronicler",
   "displayName": "Chronicler",
-  "description": "Visual Studio Screen Recorder",
-  "version": "0.1.6",
+  "description": "Screen Recorder for VS Code",
+  "version": "0.1.7",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
