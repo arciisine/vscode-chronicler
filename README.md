@@ -45,7 +45,8 @@ The available configuration options are:
   * `flags? :object` - Configuration flags to pass to the FFmpeg process 
     * `pix_fmt ?:string` - The format flag to pass to ffmpeg, defaults to `yuvj444p`.  Set to `yuv420p` if you want to support QuickTime on osx.
     * `c:v ?:string` - The video codec to use for encoding, defaults to `libx264`
-    * `preset ?:string` - The ffmpeg recording preset, defaults to `ultrafast`
+    * `preset ?:string` - The ffmpeg recording preset, defaults to `ultrafast`. Supported: (`ultrafast`, `superfast`, `veryfast`, `faster`, `fast`, `medium`, `slow`, `slower`, `veryslow`)
+     
 * `chronicler.auto-record-live-share` - Determines the state for auto recording live share sessions, defaults to `false`.  
 * `chronicler.debug` - Run the plugin in debug mode, provides more information when running FFmpeg
 
