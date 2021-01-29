@@ -68,7 +68,7 @@ export async function activate(context: vscode.ExtensionContext) {
       switch (choice) {
         case 'View': await OSUtil.openFile(file); break;
         case 'Folder': await OSUtil.openFile(path.dirname(file)); break;
-        case 'Copy': vscode.env.clipboard.writeText(file);
+        case 'Copy': vscode.env.clipboard.writeText(file); break;
         case 'Delete': await fs.unlink(file); break;
       }
     } catch (e) {

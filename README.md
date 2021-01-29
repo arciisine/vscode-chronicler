@@ -70,6 +70,12 @@ Currently, wayland support is missing
 
 # Release Notes
 
+## 0.1.9
+Updating screen-recorder/win-info to 0.2.x line, to support win32 desktop scaling.
+
+## 0.1.8
+Resolving a bug in which copying the file deletes the file as well. Additionally deleting mp4 files when deleting the animated gif.
+
 ## 0.1.6
 Updating recording icons to use debug set, which provides color.  Updating documentation.
 

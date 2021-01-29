@@ -43,7 +43,7 @@ export class Recorder {
       return opts;
     } finally {
       this.proc.stop(true);
-      delete this.proc;
+      delete (this as any)['proc'];
     }
   }
 
