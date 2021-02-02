@@ -70,6 +70,9 @@ Currently, wayland support is missing
 
 # Release Notes
 
+## 0.1.10
+Bugfix that broke darwin-based screen lookups
+
 ## 0.1.9
 Updating screen-recorder/win-info to 0.2.x line, to support win32 desktop scaling.
 
