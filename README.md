@@ -68,7 +68,11 @@ This project was inspired by:
 
 Currently, wayland support is missing
 
+
 # Release Notes
+
+## 0.1.11
+Bugfix for win32 non-US locales (different decimal point symbol).
 
 ## 0.1.10
 Bugfix that broke darwin-based screen lookups
