@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Screen Recorder for VS Code",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
@@ -118,7 +118,7 @@
     "vscode": "^1.1.37"
   },
   "dependencies": {
-    "@arcsine/screen-recorder": "^0.2.8",
+    "@arcsine/screen-recorder": "^0.2.9",
     "@arcsine/win-info": "^0.2.12",
     "vsls": "^0.3.1291"
   }
