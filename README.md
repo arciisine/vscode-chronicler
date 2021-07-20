@@ -71,6 +71,9 @@ Currently, wayland support is missing
 
 # Release Notes
 
+## 0.1.13
+Resolving reverted localization fix for windows.
+
 ## 0.1.12
 Bugfix for win32 scale detection and for handling spaces in ffmpeg path in win32
 Bugfix for x11, allow for host display environment variable to be honored
