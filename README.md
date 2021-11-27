@@ -71,6 +71,9 @@ Currently, wayland support is missing
 
 # Release Notes
 
+## 0.1.15
+Resolving spawning issue for X11 due to changes in Electron
+
 ## 0.1.14
 Resolving reverted localization fix for windows.
 
