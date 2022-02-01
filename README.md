@@ -71,6 +71,9 @@ Currently, wayland support is missing
 
 # Release Notes
 
+## 0.1.16
+Allowing workspace root to truly be undefined, and fully support operating in a workspace free environment.
+
 ## 0.1.15
 Resolving spawning issue for X11 due to changes in Electron
 

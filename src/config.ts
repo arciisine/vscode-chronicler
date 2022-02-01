@@ -79,7 +79,7 @@ export class Config {
   static async getFilename() {
     const dir = await this.getDestFolder();
     const folders = vscode.workspace.workspaceFolders;
-    const ws = folders ? folders![0].name.replace(/[^A-Za-z0-9\-_]+/g, '_') : `vscode`;
+    const ws = folders?.[0].name.replace(/[^A-Za-z0-9\-_]+/g, '_') ?? `vscode`;
     const base = `${ws}-${new Date().getTime()}.mp4`;
 
     if (!(await exists(dir))) {

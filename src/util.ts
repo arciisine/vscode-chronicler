@@ -6,7 +6,7 @@ export class Util {
 
   static getWorkspacePath() {
     const folders = vscode.workspace.workspaceFolders;
-    return folders ? folders![0].uri.fsPath : undefined;
+    return folders ? folders?.[0]?.uri.fsPath : undefined;
   }
 
   static getResource(rel: string) {
