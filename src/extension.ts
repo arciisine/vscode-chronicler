@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
+import { dirname } from 'path';
 import { promises as fs } from 'fs';
-
-import { OSUtil } from '@arcsine/screen-recorder/lib/os';
 
 import { Recorder } from './recorder';
 import { RecordingStatus } from './status';
@@ -65,9 +63,10 @@ export async function activate(context: vscode.ExtensionContext) {
       status.stop();
 
       const choice = await vscode.window.showInformationMessage(`Session output ${file}`, 'View', 'Copy', 'Delete', 'Folder');
+      console.log(vscode.Uri.file(file));
       switch (choice) {
-        case 'View': await OSUtil.openFile(file); break;
-        case 'Folder': await OSUtil.openFile(path.dirname(file)); break;
+        case 'View': await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(file)); break;
+        case 'Folder': await vscode.env.openExternal(vscode.Uri.file(dirname(file))); break;
         case 'Copy': vscode.env.clipboard.writeText(file); break;
         case 'Delete': await fs.unlink(file); break;
       }
