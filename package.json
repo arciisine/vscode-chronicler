@@ -2,7 +2,7 @@
   "name": "chronicler",
   "displayName": "Chronicler",
   "description": "Screen Recorder for VS Code",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "publisher": "arcsine",
   "repository": {
     "type": "git",
